@@ -34,25 +34,25 @@ android {
         setProperty("archivesBaseName", "SFA-" + versionName)
     }
 
-    signingConfigs {
-        release {
-            storeFile file("release.keystore")
-            storePassword getProps("KEYSTORE_PASS")
-            keyAlias getProps("ALIAS_NAME")
-            keyPassword getProps("ALIAS_PASS")
-        }
-    }
+//    signingConfigs {
+//        release {
+//            storeFile file("release.keystore")
+//            storePassword getProps("KEYSTORE_PASS")
+//            keyAlias getProps("ALIAS_NAME")
+//            keyPassword getProps("ALIAS_PASS")
+//        }
+//    }
 
     buildTypes {
-        debug {
-            if (getProps("KEYSTORE_PASS") != "") {
-                signingConfig signingConfigs.release
-            }
-        }
+//        debug {
+//            if (getProps("KEYSTORE_PASS") != "") {
+//                signingConfig signingConfigs.release
+//            }
+//        }
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
-            signingConfig signingConfigs.release
+//            signingConfig signingConfigs.release
             vcsInfo.include false
         }
     }
@@ -100,7 +100,7 @@ android {
 
 dependencies {
     implementation(fileTree("libs"))
-
+    implementation "com.github.singbox-android:libbox:1.12.4"
     implementation "androidx.core:core-ktx:1.16.0"
     implementation "androidx.appcompat:appcompat:1.7.1"
     implementation "com.google.android.material:material:1.12.0"
