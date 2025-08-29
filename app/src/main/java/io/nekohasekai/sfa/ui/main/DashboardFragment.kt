@@ -60,7 +60,7 @@ class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
                 }
 
                 Status.Started -> {
-                    // 不显示 “启用警告”
+                    // 不显示 “抛用警告”
 //                    checkDeprecatedNotes()
                     enablePager()
                     binding.fab.setImageResource(R.drawable.ic_stop_24)
