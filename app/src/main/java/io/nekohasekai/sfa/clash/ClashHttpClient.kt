@@ -1,4 +1,4 @@
-package io.nekohasekai.sfa.utils
+package io.nekohasekai.sfa.clash
 
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -12,22 +12,6 @@ class ClashHttpClient : Closeable {
         const val USER_AGENT = "clash.meta/v1.19.12"
         const val ACCEPT = "application/yaml, application/x-yaml, text/yaml, */*"
         const val ACCEPT_ENCODING = "gzip"
-        /**
-         * 用户的订阅信息
-         * @sample: upload=4841978; download=345835144; total=214748364800; expire=1777514961
-         */
-        const val SUBSCRIPTION_USERINFO = "subscription-userinfo"
-        /**
-         * 代理服务提供商的网址
-         * @sample: https://www.proxyXXX.com
-         */
-        const val PROFILE_WEB_PAGE_URL = "profile-web-page-url"
-
-        /**
-         * 通常用于保存代理服务提供商的名称
-         * @sample: attachment;filename*=UTF-8''proxyXXX.com
-         */
-        const val CONTENT_DISPOSITION = "content-disposition"
     }
 
     private val client = OkHttpClient.Builder()
@@ -35,8 +19,8 @@ class ClashHttpClient : Closeable {
         .readTimeout(10, TimeUnit.SECONDS)
         .build()
 
-    fun getString(url: String): String {
-        val result: Result<String> = runCatching {
+    fun getString(url: String): Result<ClashData> {
+        return runCatching {
             val request = Request.Builder().url(url)
                 .header("User-Agent", USER_AGENT)
                 .header("Accept", ACCEPT)
@@ -55,9 +39,8 @@ class ClashHttpClient : Closeable {
                 it.readAll(buffer)
                 content = buffer.readString(response.body.contentType()?.charset() ?: Charsets.UTF_8)
             }
-            content
+            ClashData.create(response.headers, content)
         }
-        return result.getOrThrow()
     }
     override fun close() {
         client.dispatcher.executorService.shutdown()

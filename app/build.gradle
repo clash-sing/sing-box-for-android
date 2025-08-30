@@ -105,6 +105,7 @@ dependencies {
     implementation "com.squareup.okhttp3:okhttp"
     implementation "com.squareup.okhttp3:okhttp-android"
     implementation "com.squareup.okhttp3:logging-interceptor"
+    implementation "org.yaml:snakeyaml:2.4"
 
     implementation "androidx.core:core-ktx:1.16.0"
     implementation "androidx.appcompat:appcompat:1.7.1"

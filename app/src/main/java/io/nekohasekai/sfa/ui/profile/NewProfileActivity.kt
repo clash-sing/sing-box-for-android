@@ -3,6 +3,7 @@ package io.nekohasekai.sfa.ui.profile
 import android.content.Context
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
@@ -10,6 +11,7 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.sfa.R
+import io.nekohasekai.sfa.clash.ClashHttpClient
 import io.nekohasekai.sfa.constant.EnabledType
 import io.nekohasekai.sfa.database.Profile
 import io.nekohasekai.sfa.database.ProfileManager
@@ -176,6 +178,14 @@ class NewProfileActivity : AbstractActivity<ActivityAddProfileBinding>() {
                 val remoteURL = binding.remoteURL.text
                 val content = HTTPClient().use { it.getString(remoteURL) }
                 Libbox.checkConfig(content)
+                val clashResult = ClashHttpClient().use { it.getString(remoteURL) }
+                clashResult.onSuccess {
+                    Log.d("NewProfileActivity", "clash result: $it")
+                }.onFailure {
+                    Log.e("NewProfileActivity", "clash error", it)
+                }
+
+
                 configFile.writeText(content)
                 typedProfile.remoteURL = remoteURL
                 typedProfile.lastUpdated = Date()

@@ -30,8 +30,6 @@ class HTTPClient : Closeable {
     }
 
     fun getString(url: String): String {
-        val clashContent = ClashHttpClient().getString(url)
-
         val request = client.newRequest()
         request.setUserAgent(userAgent)
         request.setURL(url)
