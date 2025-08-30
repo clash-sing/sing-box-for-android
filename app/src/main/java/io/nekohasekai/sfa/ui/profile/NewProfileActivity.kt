@@ -180,7 +180,14 @@ class NewProfileActivity : AbstractActivity<ActivityAddProfileBinding>() {
                 Libbox.checkConfig(content)
                 val clashResult = ClashHttpClient().use { it.getString(remoteURL) }
                 clashResult.onSuccess {
-                    Log.d("NewProfileActivity", "clash result: $it")
+                    val map: Map<String, *> = it.clashContent
+                    val groups: List<*> = map["proxy-groups"] as List<*>
+                    @Suppress("UNCHECKED_CAST")
+                    val group: Map<String, *> = groups[0] as Map<String,*>
+                    val proxies = group["proxies"] as List<*>
+                    Log.d("NewProfileActivity", "clash result: ${proxies.size}")
+
+
                 }.onFailure {
                     Log.e("NewProfileActivity", "clash error", it)
                 }

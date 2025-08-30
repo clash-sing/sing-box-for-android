@@ -15,7 +15,7 @@ data class ClashData(
     /** 代理服务提供商的名称 */
     val spDisposition: String = "",
     /** 节点分组 */
-    val clashContent: Map<String, Any> = mapOf(),
+    val clashContent: Map<String, *> = emptyMap<String, Any>(),
 ) {
     companion object {
         /**
