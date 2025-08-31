@@ -42,6 +42,7 @@
                     android:id="@+id/profile_used"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textAppearance="?textAppearanceBodySmall"
                     tools:text="0.21 GB / 200GB" />
                 <TextView
                     android:layout_width="0dp"
@@ -51,6 +52,7 @@
                     android:id="@+id/profile_expire"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textAppearance="?textAppearanceBodySmall"
                     tools:text="2026-08-29" />
             </LinearLayout>
             <TextView

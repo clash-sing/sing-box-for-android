@@ -229,7 +229,7 @@ class ConfigurationFragment : Fragment() {
                             }
                             userinfo.totalBytes?.let {
                                 if (usedText.isNotBlank()) usedText += " / "
-                                usedText += "%.2f".format(it / 1024.0f / 1024.0f / 1024.0f ) + " GB"
+                                usedText += "%.0f".format(it / 1024.0f / 1024.0f / 1024.0f ) + " GB"
                             }
                             binding.profileUsed.text = usedText
                         }
