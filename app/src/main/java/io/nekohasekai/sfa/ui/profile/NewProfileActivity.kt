@@ -13,6 +13,7 @@ import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.clash.Clash2SingBox
 import io.nekohasekai.sfa.clash.ClashHttpClient
+import io.nekohasekai.sfa.clash.SubscriptionUserinfoManager
 import io.nekohasekai.sfa.constant.EnabledType
 import io.nekohasekai.sfa.database.Profile
 import io.nekohasekai.sfa.database.ProfileManager
@@ -187,8 +188,11 @@ class NewProfileActivity : AbstractActivity<ActivityAddProfileBinding>() {
                 var content = HTTPClient().use { it.getString(remoteURL) }
                 Libbox.checkConfig(content)
                 val clashResult = ClashHttpClient().use { it.getString(remoteURL) }
-                clashResult.onSuccess {
-                    val clash2SingBox = Clash2SingBox(it, content)
+                clashResult.onSuccess { clashData ->
+                    clashData.subscriptionUserinfo?.let {
+                        SubscriptionUserinfoManager.setUserinfo(fileID, it)
+                    }
+                    val clash2SingBox = Clash2SingBox(clashData, content)
                     content = clash2SingBox.getFixedSingBox().toString()
                 }.onFailure {
                     Log.e("NewProfileActivity", "clash error", it)

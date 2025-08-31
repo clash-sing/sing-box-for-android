@@ -6,14 +6,14 @@ import kotlinx.parcelize.Parcelize
 
 object SubscriptionUserinfoManager {
     private val mmkv: MMKV = MMKV.mmkvWithID("subscription_userinfo", MMKV.MULTI_PROCESS_MODE)
-    fun setUserinfo(profileId: Int, userinfo: SubscriptionUserinfo) {
+    fun setUserinfo(profileId: Long, userinfo: SubscriptionUserinfo) {
         mmkv.encode("profile_$profileId", userinfo)
     }
-    fun getUserinfo(profileId: Int): SubscriptionUserinfo? {
+    fun getUserinfo(profileId: Long): SubscriptionUserinfo? {
         return mmkv.decodeParcelable("profile_$profileId", SubscriptionUserinfo::class.java)
     }
 
-    fun remove(profileId: Int) {
+    fun remove(profileId: Long) {
         mmkv.removeValueForKey("profile_$profileId")
     }
     fun clear() {

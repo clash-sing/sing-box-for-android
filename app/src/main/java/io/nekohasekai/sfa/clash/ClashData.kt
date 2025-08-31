@@ -4,16 +4,7 @@ import okhttp3.Headers
 import org.yaml.snakeyaml.Yaml
 
 data class ClashData(
-    /** 当月使用量，单位：Byte */
-    val usedBytes: Long?,
-    /** 每月限额，单位：Byte */
-    val totalBytes: Long?,
-    /** 订阅到期日 */
-    val expireTimestamp: Long?,
-    /** 代理服务提供商的网址 */
-    val spUrl: String = "",
-    /** 代理服务提供商的名称 */
-    val spDisposition: String = "",
+    val subscriptionUserinfo: SubscriptionUserinfo? = null,
     /** 节点分组 */
     val clashContent: Map<String, *> = emptyMap<String, Any>(),
 ) {
@@ -57,11 +48,13 @@ data class ClashData(
                 disposition.split("''", ignoreCase = true).takeIf { it.size == 2 }?.get(1)
             } ?: ""
             return  ClashData(
-                usedBytes = usedBytes,
-                totalBytes = totalBytes,
-                expireTimestamp = expireTimestamp,
-                spUrl = profileWebPageUrl,
-                spDisposition = contentDisposition,
+                subscriptionUserinfo = SubscriptionUserinfo(
+                    usedBytes = usedBytes,
+                    totalBytes = totalBytes,
+                    expireTimestamp = expireTimestamp,
+                    spUrl = profileWebPageUrl,
+                    spDisposition = contentDisposition
+                ),
                 clashContent = Yaml().load(content)
             )
         }
