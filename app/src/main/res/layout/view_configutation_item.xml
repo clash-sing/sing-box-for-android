@@ -30,9 +30,39 @@
                 android:textAppearance="?textAppearanceTitleMedium"
                 android:textColor="?android:attr/textColorPrimary"
                 tools:text="Profile name" />
-
+            <LinearLayout
+                android:id="@+id/profile_userinfo"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:visibility="gone"
+                tools:visibility="visible">
+                <TextView
+                    android:id="@+id/profile_used"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    tools:text="0.21 GB / 200GB" />
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content" />
+                <TextView
+                    android:id="@+id/profile_expire"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    tools:text="2026-08-29" />
+            </LinearLayout>
             <TextView
-                tools:visibility="gone"
+                android:id="@+id/profile_url"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:textAppearance="?textAppearanceBodySmall"
+                android:visibility="gone"
+                tools:visibility="visible"
+                tools:text="https://clashsing.com" />
+            <TextView
                 android:id="@+id/profile_last_updated"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

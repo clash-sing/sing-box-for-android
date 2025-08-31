@@ -41,6 +41,9 @@ data class ClashData(
                     if (uploadBytes != null || downloadBytes != null) usedBytes = (uploadBytes ?: 0) + (downloadBytes ?: 0)
                     totalBytes = getSubscriptionValue("total=", subscriptionArray[2])
                     expireTimestamp = getSubscriptionValue("expire=", subscriptionArray[3])
+                    if (expireTimestamp != null && expireTimestamp.toString().length == 10) {
+                        expireTimestamp *= 1000
+                    }
                 }
             }
             val profileWebPageUrl: String = headers[PROFILE_WEB_PAGE_URL] ?: ""

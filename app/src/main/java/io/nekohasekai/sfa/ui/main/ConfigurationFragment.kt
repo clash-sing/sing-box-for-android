@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import io.nekohasekai.sfa.R
+import io.nekohasekai.sfa.clash.SubscriptionUserinfoManager
 import io.nekohasekai.sfa.database.Profile
 import io.nekohasekai.sfa.database.ProfileManager
 import io.nekohasekai.sfa.database.TypedProfile
@@ -36,7 +37,9 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.DateFormat
+import java.text.SimpleDateFormat
 import java.util.Collections
+import java.util.Locale
 
 class ConfigurationFragment : Fragment() {
 
@@ -216,6 +219,30 @@ class ConfigurationFragment : Fragment() {
                     R.string.profile_item_last_updated,
                     DateFormat.getDateTimeInstance().format(profile.typed.lastUpdated)
                 )
+                SubscriptionUserinfoManager.getUserinfo(profile.id)?.let { userinfo ->
+                    if (userinfo.usedBytes != null || userinfo.totalBytes != null || userinfo.expireTimestamp != null || userinfo.spUrl.isNotBlank()) {
+                        binding.profileUserinfo.isVisible = true
+                        if (userinfo.usedBytes != null || userinfo.totalBytes != null) {
+                            var usedText = ""
+                            userinfo.usedBytes?.let {
+                                usedText = "%.2f".format(it / 1024.0f / 1024.0f / 1024.0f ) + " GB"
+                            }
+                            userinfo.totalBytes?.let {
+                                if (usedText.isNotBlank()) usedText += " / "
+                                usedText += "%.2f".format(it / 1024.0f / 1024.0f / 1024.0f ) + " GB"
+                            }
+                            binding.profileUsed.text = usedText
+                        }
+                        userinfo.expireTimestamp?.let {
+                            val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                            binding.profileExpire.text = sdf.format(it)
+                        }
+                        if (userinfo.spUrl.isNotBlank()) {
+                            binding.profileUrl.isVisible = true
+                            binding.profileUrl.text = userinfo.spUrl
+                        }
+                    }
+                }
             } else {
                 binding.profileLastUpdated.isVisible = false
             }

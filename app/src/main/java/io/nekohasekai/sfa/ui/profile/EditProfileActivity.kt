@@ -177,7 +177,7 @@ class EditProfileActivity : AbstractActivity<ActivityEditProfileBinding>() {
                 var content = HTTPClient().use { it.getString(profile.typed.remoteURL) }
                 Libbox.checkConfig(content)
                 val clashResult = ClashHttpClient().use { it.getString(profile.typed.remoteURL) }
-                clashResult.onSuccess {clashData ->
+                clashResult.onSuccess { clashData ->
                     clashData.subscriptionUserinfo?.let {
                         SubscriptionUserinfoManager.setUserinfo(profile.id, it)
                     }
