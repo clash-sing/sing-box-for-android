@@ -2,12 +2,15 @@ package io.nekohasekai.sfa.ui.profile
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.bg.UpdateProfileWork
+import io.nekohasekai.sfa.clash.Clash2SingBox
+import io.nekohasekai.sfa.clash.ClashHttpClient
 import io.nekohasekai.sfa.constant.EnabledType
 import io.nekohasekai.sfa.database.Profile
 import io.nekohasekai.sfa.database.ProfileManager
@@ -170,8 +173,15 @@ class EditProfileActivity : AbstractActivity<ActivityEditProfileBinding>() {
         lifecycleScope.launch(Dispatchers.IO) {
             var selectedProfileUpdated = false
             try {
-                val content = HTTPClient().use { it.getString(profile.typed.remoteURL) }
+                var content = HTTPClient().use { it.getString(profile.typed.remoteURL) }
                 Libbox.checkConfig(content)
+                val clashResult = ClashHttpClient().use { it.getString(profile.typed.remoteURL) }
+                clashResult.onSuccess {
+                    val clash2SingBox = Clash2SingBox(it, content)
+                    content = clash2SingBox.getFixedSingBox().toString()
+                }.onFailure {
+                    Log.e("NewProfileActivity", "clash error", it)
+                }
                 val file = File(profile.typed.path)
                 if (file.readText() != content) {
                     File(profile.typed.path).writeText(content)
