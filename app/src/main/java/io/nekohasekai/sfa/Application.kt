@@ -10,6 +10,7 @@ import android.net.ConnectivityManager
 import android.net.wifi.WifiManager
 import android.os.PowerManager
 import androidx.core.content.getSystemService
+import com.tencent.mmkv.MMKV
 import go.Seq
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.libbox.SetupOptions
@@ -33,6 +34,7 @@ class Application : Application() {
     override fun onCreate() {
         super.onCreate()
 
+        MMKV.initialize(this)
         Seq.setContext(this)
         Libbox.setLocale(Locale.getDefault().toLanguageTag().replace("-", "_"))
 
