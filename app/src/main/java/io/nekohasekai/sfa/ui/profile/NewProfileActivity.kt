@@ -11,6 +11,7 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.sfa.R
+import io.nekohasekai.sfa.clash.Clash2SingBox
 import io.nekohasekai.sfa.clash.ClashHttpClient
 import io.nekohasekai.sfa.constant.EnabledType
 import io.nekohasekai.sfa.database.Profile
@@ -53,6 +54,13 @@ class NewProfileActivity : AbstractActivity<ActivityAddProfileBinding>() {
         super.onCreate(savedInstanceState)
 
         setTitle(R.string.title_new_profile)
+        binding.type.text = TypedProfile.Type.Remote.getString(this)
+        binding.importFileButton.isVisible = true
+        binding.sourceURL.isVisible = true
+        binding.localFields.isVisible = false
+        binding.remoteFields.isVisible = true
+        binding.autoUpdateInterval.text = "60"
+
 
         intent.getStringExtra("importName")?.also { importName ->
             intent.getStringExtra("importURL")?.also { importURL ->
@@ -176,18 +184,12 @@ class NewProfileActivity : AbstractActivity<ActivityAddProfileBinding>() {
             TypedProfile.Type.Remote.getString(this) -> {
                 typedProfile.type = TypedProfile.Type.Remote
                 val remoteURL = binding.remoteURL.text
-                val content = HTTPClient().use { it.getString(remoteURL) }
+                var content = HTTPClient().use { it.getString(remoteURL) }
                 Libbox.checkConfig(content)
                 val clashResult = ClashHttpClient().use { it.getString(remoteURL) }
                 clashResult.onSuccess {
-                    val map: Map<String, *> = it.clashContent
-                    val groups: List<*> = map["proxy-groups"] as List<*>
-                    @Suppress("UNCHECKED_CAST")
-                    val group: Map<String, *> = groups[0] as Map<String,*>
-                    val proxies = group["proxies"] as List<*>
-                    Log.d("NewProfileActivity", "clash result: ${proxies.size}")
-
-
+                    val clash2SingBox = Clash2SingBox(it, content)
+                    content = clash2SingBox.getFixedSingBox().toString()
                 }.onFailure {
                     Log.e("NewProfileActivity", "clash error", it)
                 }

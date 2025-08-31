@@ -53,8 +53,8 @@ data class ClashData(
                 }
             }
             val profileWebPageUrl: String = headers[PROFILE_WEB_PAGE_URL] ?: ""
-            val contentDisposition: String = headers[CONTENT_DISPOSITION]?.apply {
-                this.split("''", ignoreCase = true).takeIf { it.size == 2 }?.get(1)
+            val contentDisposition: String = headers[CONTENT_DISPOSITION]?.let { disposition ->
+                disposition.split("''", ignoreCase = true).takeIf { it.size == 2 }?.get(1)
             } ?: ""
             return  ClashData(
                 usedBytes = usedBytes,
