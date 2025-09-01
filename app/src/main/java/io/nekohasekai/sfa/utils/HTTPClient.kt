@@ -34,7 +34,8 @@ class HTTPClient : Closeable {
         request.setUserAgent(userAgent)
         request.setURL(url)
         val response = request.execute()
-        return response.content.unwrap
+        val content = response.content
+        return content.unwrap
     }
 
     override fun close() {
