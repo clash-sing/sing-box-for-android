@@ -1,4 +1,4 @@
-package io.nekohasekai.sfa.clash
+package io.nekohasekai.sfa.cs
 
 import android.os.Parcelable
 import com.tencent.mmkv.MMKV

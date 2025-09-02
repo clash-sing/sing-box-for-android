@@ -1,4 +1,4 @@
-package io.nekohasekai.sfa.clash
+package io.nekohasekai.sfa.cs
 
 import org.json.JSONArray
 import org.json.JSONObject

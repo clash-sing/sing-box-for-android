@@ -17,7 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import io.nekohasekai.sfa.R
-import io.nekohasekai.sfa.clash.SubscriptionUserinfoManager
+import io.nekohasekai.sfa.cs.SubscriptionUserinfoManager
 import io.nekohasekai.sfa.database.Profile
 import io.nekohasekai.sfa.database.ProfileManager
 import io.nekohasekai.sfa.database.TypedProfile

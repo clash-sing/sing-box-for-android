@@ -1,4 +1,4 @@
-package io.nekohasekai.sfa.clash
+package io.nekohasekai.sfa.cs
 
 import okhttp3.OkHttpClient
 import okhttp3.Request
