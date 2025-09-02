@@ -10,7 +10,7 @@ import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.bg.UpdateProfileWork
 import io.nekohasekai.sfa.cs.Clash2SingBox
-import io.nekohasekai.sfa.cs.ClashHttpClient
+import io.nekohasekai.sfa.cs.ClashSingHttpClient
 import io.nekohasekai.sfa.cs.SubscriptionUserinfoManager
 import io.nekohasekai.sfa.constant.EnabledType
 import io.nekohasekai.sfa.database.Profile
@@ -176,7 +176,7 @@ class EditProfileActivity : AbstractActivity<ActivityEditProfileBinding>() {
             try {
                 var content = HTTPClient().use { it.getString(profile.typed.remoteURL) }
                 Libbox.checkConfig(content)
-                val clashResult = ClashHttpClient().use { it.getString(profile.typed.remoteURL) }
+                val clashResult = ClashSingHttpClient().use { it.getString(profile.typed.remoteURL) }
                 clashResult.onSuccess { clashData ->
                     clashData.subscriptionUserinfo?.let {
                         SubscriptionUserinfoManager.setUserinfo(profile.id, it)
