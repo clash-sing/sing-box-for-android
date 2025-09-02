@@ -9,12 +9,12 @@ import io.nekohasekai.sfa.Application
 import io.nekohasekai.sfa.cs.parser.DefaultSubscriptionParserImpl
 import io.nekohasekai.sfa.cs.parser.SubscriptionParser
 import io.nekohasekai.sfa.utils.HTTPClient
+import okhttp3.Headers
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okio.BufferedSource
 import okio.GzipSource
 import okio.buffer
-import org.json.JSONObject
 import org.yaml.snakeyaml.Yaml
 import java.io.Closeable
 import java.lang.reflect.Type
@@ -38,16 +38,17 @@ class ClashSingClient(val profileId: Long) : Closeable {
         val singBoxContent = HTTPClient().use { it.getString(url) }
         val singBoxMap = try {
             val type: Type = object : TypeToken<Map<String, Any?>>(){}.type
-            Gson().fromJson<Map<String, Any?>>(singBoxContent, type)
+            Gson().fromJson(singBoxContent, type)
         } catch (e: Exception) {
             emptyMap<String, Any?>()
         }
-        val clashSingContent = runCatching {
-            getClashSingString(url).trim()
+        val resultWrapper = runCatching {
+            getClashSingString(url)
         }
-        if (clashSingContent.isSuccess) {
-            val mapClashSing = Yaml().load<Map<String, Any?>>(clashSingContent.getOrNull())
+        if (resultWrapper.isSuccess) {
+            val mapClashSing = Yaml().load<Map<String, Any?>>(resultWrapper.getOrNull()?.content)
             val parser = DefaultSubscriptionParserImpl(singBoxMap, mapClashSing)
+            parser.setSubscriptionUserinfo(profileId, resultWrapper.getOrNull()!!)
             val newContent = parser.getFixedContent()
             return newContent
         } else {
@@ -55,7 +56,7 @@ class ClashSingClient(val profileId: Long) : Closeable {
         }
     }
 
-    private fun getClashSingString(url: String): String {
+    private fun getClashSingString(url: String): ClashSingWrapper {
         val request = Request.Builder().url(url)
             .removeHeader("User-Agent")
             .header("User-Agent", getUserAgent())
@@ -74,7 +75,7 @@ class ClashSingClient(val profileId: Long) : Closeable {
             it.readAll(buffer)
             buffer.readString(response.body.contentType()?.charset() ?: Charsets.UTF_8)
         }
-        return csContent
+        return ClashSingWrapper(csContent.trim(), response.headers)
     }
 
     private fun getUserAgent(): String {
@@ -85,31 +86,7 @@ class ClashSingClient(val profileId: Long) : Closeable {
         }
         return "$defaultUserAgent $USER_AGENT"
     }
-/*
-    fun getString(url: String): Result<ClashData> {
-        return runCatching {
-            val request = Request.Builder().url(url)
-                .header("User-Agent", USER_AGENT)
-                .header("Accept", ACCEPT)
-                .header("Accept-Encoding", ACCEPT_ENCODING)
-                .build()
-            val response = client.newCall(request).execute()
-            val source = response.body.source()
-            val gzipSource = if ("gzip" == response.header("Content-Encoding")) {
-                GzipSource(source)
-            } else {
-                source
-            }
-            var content = ""
-            gzipSource.buffer().use {
-                val buffer = okio.Buffer()
-                it.readAll(buffer)
-                content = buffer.readString(response.body.contentType()?.charset() ?: Charsets.UTF_8)
-            }
-            ClashData.create(response.headers, content)
-        }
-    }
-*/
+
     override fun close() {
         client.dispatcher.executorService.shutdown()
         client.connectionPool.evictAll()
