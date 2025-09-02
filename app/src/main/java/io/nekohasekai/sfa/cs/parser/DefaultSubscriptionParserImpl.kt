@@ -117,7 +117,4 @@ class DefaultSubscriptionParserImpl(mapSingBox: Map<String, Any?>, mapClashSing:
             }?.replace(key, "", true)?.trim()?.toLongOrNull()
         }
     }
-
-
-
 }

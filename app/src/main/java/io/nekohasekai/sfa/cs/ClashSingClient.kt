@@ -3,13 +3,10 @@ package io.nekohasekai.sfa.cs
 import android.webkit.WebSettings
 import androidx.annotation.WorkerThread
 import com.google.gson.Gson
-import com.google.gson.JsonParser
 import com.google.gson.reflect.TypeToken
 import io.nekohasekai.sfa.Application
 import io.nekohasekai.sfa.cs.parser.DefaultSubscriptionParserImpl
-import io.nekohasekai.sfa.cs.parser.SubscriptionParser
 import io.nekohasekai.sfa.utils.HTTPClient
-import okhttp3.Headers
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okio.BufferedSource
