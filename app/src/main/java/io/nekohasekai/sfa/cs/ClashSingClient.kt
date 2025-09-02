@@ -1,16 +1,30 @@
 package io.nekohasekai.sfa.cs
 
+import android.webkit.WebSettings
+import androidx.annotation.WorkerThread
+import com.google.gson.Gson
+import com.google.gson.JsonParser
+import com.google.gson.reflect.TypeToken
+import io.nekohasekai.sfa.Application
+import io.nekohasekai.sfa.cs.parser.DefaultSubscriptionParserImpl
+import io.nekohasekai.sfa.cs.parser.SubscriptionParser
+import io.nekohasekai.sfa.utils.HTTPClient
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okio.BufferedSource
 import okio.GzipSource
 import okio.buffer
+import org.json.JSONObject
+import org.yaml.snakeyaml.Yaml
 import java.io.Closeable
+import java.lang.reflect.Type
 import java.util.concurrent.TimeUnit
+import kotlin.io.use
 
-class ClashSingClient : Closeable {
+class ClashSingClient(val profileId: Long) : Closeable {
     companion object {
-        const val USER_AGENT = "clash.meta/v1.19.12"
-        const val ACCEPT = "application/yaml, application/x-yaml, text/yaml, */*"
+        const val USER_AGENT = "clashmeta/v1.19.12"
+        const val ACCEPT = "application/json, application/yaml;q=0.8, text/plain;q=0.5"
         const val ACCEPT_ENCODING = "gzip"
     }
 
@@ -19,6 +33,59 @@ class ClashSingClient : Closeable {
         .readTimeout(10, TimeUnit.SECONDS)
         .build()
 
+    @WorkerThread
+    fun getString(url: String): String {
+        val singBoxContent = HTTPClient().use { it.getString(url) }
+        val singBoxMap = try {
+            val type: Type = object : TypeToken<Map<String, Any?>>(){}.type
+            Gson().fromJson<Map<String, Any?>>(singBoxContent, type)
+        } catch (e: Exception) {
+            emptyMap<String, Any?>()
+        }
+        val clashSingContent = runCatching {
+            getClashSingString(url).trim()
+        }
+        if (clashSingContent.isSuccess) {
+            val mapClashSing = Yaml().load<Map<String, Any?>>(clashSingContent.getOrNull())
+            val parser = DefaultSubscriptionParserImpl(singBoxMap, mapClashSing)
+            val newContent = parser.getFixedContent()
+            return newContent
+        } else {
+            return singBoxContent
+        }
+    }
+
+    private fun getClashSingString(url: String): String {
+        val request = Request.Builder().url(url)
+            .removeHeader("User-Agent")
+            .header("User-Agent", getUserAgent())
+            .header("Accept", ACCEPT)
+            .header("Accept-Encoding", ACCEPT_ENCODING)
+            .build()
+        val response = client.newCall(request).execute()
+        val source = response.body.source()
+        val gzipSource = if ("gzip" == response.header("Content-Encoding")) {
+            GzipSource(source)
+        } else {
+            source
+        }
+        val csContent = gzipSource.buffer().use<BufferedSource, String> {
+            val buffer = okio.Buffer()
+            it.readAll(buffer)
+            buffer.readString(response.body.contentType()?.charset() ?: Charsets.UTF_8)
+        }
+        return csContent
+    }
+
+    private fun getUserAgent(): String {
+        val defaultUserAgent = try {
+            WebSettings.getDefaultUserAgent(Application.application)
+        } catch (e: Exception) {
+            System.getProperty("http.agent") ?: ""
+        }
+        return "$defaultUserAgent $USER_AGENT"
+    }
+/*
     fun getString(url: String): Result<ClashData> {
         return runCatching {
             val request = Request.Builder().url(url)
@@ -42,6 +109,7 @@ class ClashSingClient : Closeable {
             ClashData.create(response.headers, content)
         }
     }
+*/
     override fun close() {
         client.dispatcher.executorService.shutdown()
         client.connectionPool.evictAll()

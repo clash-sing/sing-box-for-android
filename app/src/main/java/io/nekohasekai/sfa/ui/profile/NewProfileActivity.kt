@@ -185,8 +185,10 @@ class NewProfileActivity : AbstractActivity<ActivityAddProfileBinding>() {
             TypedProfile.Type.Remote.getString(this) -> {
                 typedProfile.type = TypedProfile.Type.Remote
                 val remoteURL = binding.remoteURL.text
-                var content = HTTPClient().use { it.getString(remoteURL) }
+                val content = ClashSingClient(fileID).use { it.getString(remoteURL) }
+//                val content = HTTPClient().use { it.getString(remoteURL) }
                 Libbox.checkConfig(content)
+/*
                 val clashResult = ClashSingClient().use { it.getString(remoteURL) }
                 clashResult.onSuccess { clashData ->
                     clashData.subscriptionUserinfo?.let {
@@ -197,6 +199,7 @@ class NewProfileActivity : AbstractActivity<ActivityAddProfileBinding>() {
                 }.onFailure {
                     Log.e("NewProfileActivity", "clash error", it)
                 }
+*/
 
 
                 configFile.writeText(content)

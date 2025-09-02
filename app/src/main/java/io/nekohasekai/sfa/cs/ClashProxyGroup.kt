@@ -1,15 +1,16 @@
 package io.nekohasekai.sfa.cs
 
-import kotlinx.serialization.Serializable
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
-@Serializable
+@Parcelize
 data class ClashProxyGroup(
     val name: String,
     val type: String,
     val proxies: MutableList<String>,
     val url: String? = null,
     val interval: Int? = null,
-) {
+) : Parcelable {
     companion object {
         fun create(group: Map<String, Any?>): ClashProxyGroup? {
             val name = group["name"] as? String

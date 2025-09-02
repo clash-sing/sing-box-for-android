@@ -174,8 +174,9 @@ class EditProfileActivity : AbstractActivity<ActivityEditProfileBinding>() {
         lifecycleScope.launch(Dispatchers.IO) {
             var selectedProfileUpdated = false
             try {
-                var content = HTTPClient().use { it.getString(profile.typed.remoteURL) }
+                val content = ClashSingClient(profile.id).use { it.getString(profile.typed.remoteURL) }
                 Libbox.checkConfig(content)
+/*
                 val clashResult = ClashSingClient().use { it.getString(profile.typed.remoteURL) }
                 clashResult.onSuccess { clashData ->
                     clashData.subscriptionUserinfo?.let {
@@ -186,6 +187,7 @@ class EditProfileActivity : AbstractActivity<ActivityEditProfileBinding>() {
                 }.onFailure {
                     Log.e("NewProfileActivity", "clash error", it)
                 }
+*/
                 val file = File(profile.typed.path)
                 if (file.readText() != content) {
                     File(profile.typed.path).writeText(content)
