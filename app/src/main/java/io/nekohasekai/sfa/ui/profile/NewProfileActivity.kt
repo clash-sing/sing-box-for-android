@@ -12,7 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import io.nekohasekai.libbox.Libbox
 import io.nekohasekai.sfa.R
 import io.nekohasekai.sfa.cs.Clash2SingBox
-import io.nekohasekai.sfa.cs.ClashSingHttpClient
+import io.nekohasekai.sfa.cs.ClashSingClient
 import io.nekohasekai.sfa.cs.SubscriptionUserinfoManager
 import io.nekohasekai.sfa.constant.EnabledType
 import io.nekohasekai.sfa.database.Profile
@@ -187,7 +187,7 @@ class NewProfileActivity : AbstractActivity<ActivityAddProfileBinding>() {
                 val remoteURL = binding.remoteURL.text
                 var content = HTTPClient().use { it.getString(remoteURL) }
                 Libbox.checkConfig(content)
-                val clashResult = ClashSingHttpClient().use { it.getString(remoteURL) }
+                val clashResult = ClashSingClient().use { it.getString(remoteURL) }
                 clashResult.onSuccess { clashData ->
                     clashData.subscriptionUserinfo?.let {
                         SubscriptionUserinfoManager.setUserinfo(fileID, it)

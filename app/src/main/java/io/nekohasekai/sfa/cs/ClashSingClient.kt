@@ -7,7 +7,7 @@ import okio.buffer
 import java.io.Closeable
 import java.util.concurrent.TimeUnit
 
-class ClashSingHttpClient : Closeable {
+class ClashSingClient : Closeable {
     companion object {
         const val USER_AGENT = "clash.meta/v1.19.12"
         const val ACCEPT = "application/yaml, application/x-yaml, text/yaml, */*"
