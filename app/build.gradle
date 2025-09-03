@@ -100,6 +100,7 @@ android {
 
 dependencies {
     implementation(fileTree("libs"))
+    implementation project(':proxyLib')
     implementation "com.github.singbox-android:libbox:1.12.4"
     implementation platform("com.squareup.okhttp3:okhttp-bom:5.1.0")
     implementation "com.squareup.okhttp3:okhttp"
