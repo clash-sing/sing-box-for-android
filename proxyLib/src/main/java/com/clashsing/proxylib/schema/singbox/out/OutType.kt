@@ -1,7 +1,9 @@
 package com.clashsing.proxylib.schema.singbox.out
 
+import android.os.Parcelable
 
-interface OutType {
+
+interface OutType : Parcelable {
     val type: String
     val tag: String
     companion object {

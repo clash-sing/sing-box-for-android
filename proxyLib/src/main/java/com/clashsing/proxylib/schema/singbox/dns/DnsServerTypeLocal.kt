@@ -10,4 +10,4 @@ import kotlinx.serialization.Serializable
 data class DnsServerTypeLocal(
     override val type: String = DnsServerType.LOCAL,
     override val tag: String = "system"
-) : DnsServerType, Parcelable
+) : DnsServerType

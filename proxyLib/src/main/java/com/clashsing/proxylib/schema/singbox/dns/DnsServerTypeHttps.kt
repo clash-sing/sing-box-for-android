@@ -11,4 +11,4 @@ data class DnsServerTypeHttps(
     override val type: String = DnsServerType.HTTPS,
     override val tag: String = DnsServerType.HTTPS,
     val server: String = "223.5.5.5"
-) : DnsServerType, Parcelable
+) : DnsServerType

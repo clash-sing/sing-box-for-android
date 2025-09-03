@@ -15,4 +15,4 @@ data class OutTypeUrlTest(
     /** 以毫秒为单位的测试容差。 默认使用 50 */
     val tolerance: Int = 50,
     val outbounds: List<String> = emptyList()
-) : OutType, Parcelable
+) : OutType

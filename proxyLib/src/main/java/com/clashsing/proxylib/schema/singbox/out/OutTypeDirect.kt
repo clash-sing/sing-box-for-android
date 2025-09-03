@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 
 @Parcelize
 @Serializable
-object OutTypeDirect : OutType, Parcelable {
+object OutTypeDirect : OutType {
     @IgnoredOnParcel
     override val type: String = OutType.DIRECT
     @IgnoredOnParcel

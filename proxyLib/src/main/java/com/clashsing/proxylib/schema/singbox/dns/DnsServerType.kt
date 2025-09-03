@@ -1,6 +1,8 @@
 package com.clashsing.proxylib.schema.singbox.dns
 
-interface DnsServerType {
+import android.os.Parcelable
+
+interface DnsServerType : Parcelable {
     val type: String
     val tag: String
     companion object {

@@ -14,4 +14,4 @@ data class DnsServerTypeFakeIP(
     val inet4Range: String = "198.18.0.0/15",
     @SerialName("inet6_range")
     val inet6Range: String = "fc00::/18",
-) : DnsServerType, Parcelable
+) : DnsServerType

@@ -16,4 +16,4 @@ data class OutTypeTrojan(
     val password: String,
     val tls: TlsOut = TlsOut(enabled = true, disableSni = true, serverName = "", insecure = true),
     val transport: Transport = Transport()
-) : OutType, Parcelable
+) : OutType

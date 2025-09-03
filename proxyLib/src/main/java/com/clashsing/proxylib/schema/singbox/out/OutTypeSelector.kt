@@ -10,4 +10,4 @@ data class OutTypeSelector(
     override val type: String = OutType.SELECTOR,
     override val tag: String,
     val outbounds: List<String> = emptyList(),
-) : OutType, Parcelable
+) : OutType

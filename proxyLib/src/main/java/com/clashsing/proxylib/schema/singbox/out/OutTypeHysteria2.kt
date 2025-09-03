@@ -24,4 +24,4 @@ data class OutTypeHysteria2(
         serverName = "",
         alpn = listOf("h3")
     )
-) : OutType, Parcelable
+) : OutType

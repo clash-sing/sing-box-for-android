@@ -21,4 +21,4 @@ data class OutTypeAnyTls(
         insecure = true,
         utls = TlsOut.Utls()
     )
-) : Parcelable, OutType
+) : OutType
