@@ -15,4 +15,24 @@ data class TlsOut(
     val serverName: String = "",
     val insecure: Boolean = false,
     val alpn: List<String> = emptyList(),
-) : Parcelable
+    val utls: Utls? = null
+) : Parcelable {
+    @Parcelize
+    @Serializable
+    data class Utls(
+        val enabled: Boolean = true,
+        val fingerprint: String = CHROME,
+    ) : Parcelable {
+        companion object {
+            const val CHROME = "chrome"
+            const val FIREFOX = "firefox"
+            const val EDGE = "edge"
+            const val SAFARI = "safari"
+            const val QQ = "qq"
+            const val IOS = "ios"
+            const val ANDROID = "android"
+            const val RANDOM = "random"
+            const val RANDOMIZED = "randomized"
+        }
+    }
+}
