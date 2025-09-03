@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 @Parcelize
 @Serializable
 data class OutTypeUrlTest(
-    override val type: String = OutType.Type.URLTEST,
+    override val type: String = OutType.URLTEST,
     override val tag: String,
     val url: String = "",
     /** 测试间隔。 默认使用 3m */

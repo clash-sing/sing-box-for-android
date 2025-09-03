@@ -9,7 +9,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 object OutTypeBlock : OutType, Parcelable {
     @IgnoredOnParcel
-    override val type: String = OutType.Type.BLOCK
+    override val type: String = OutType.BLOCK
     @IgnoredOnParcel
-    override val tag: String = OutType.Type.BLOCK
+    override val tag: String = OutType.BLOCK
 }

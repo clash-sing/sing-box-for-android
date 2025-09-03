@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 @Parcelize
 @Serializable
 data class OutTypeHysteria(
-    override val type: String = OutType.Type.HYSTERIA,
+    override val type: String = OutType.HYSTERIA,
     override val tag: String,
     val server: String,
     @SerialName("server_port")

@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 @Parcelize
 @Serializable
 data class OutTypeAnyTls(
-    override val type: String = OutType.Type.ANYTLS,
+    override val type: String = OutType.ANYTLS,
     override val tag: String,
     val server: String,
     @SerialName("server_port")

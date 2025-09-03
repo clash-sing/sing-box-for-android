@@ -4,7 +4,7 @@ package com.clashsing.proxylib.schema.singbox.out
 interface OutType {
     val type: String
     val tag: String
-    object Type {
+    companion object {
         const val DIRECT = "direct"
         const val BLOCK = "block"
         const val SOCKS = "socks"
@@ -24,6 +24,5 @@ interface OutType {
         const val DNS = "dns"
         const val SELECTOR = "selector"
         const val URLTEST = "urltest"
-
     }
 }

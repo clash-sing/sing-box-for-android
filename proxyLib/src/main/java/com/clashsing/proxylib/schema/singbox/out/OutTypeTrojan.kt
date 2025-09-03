@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 @Parcelize
 @Serializable
 data class OutTypeTrojan(
-    override val type: String = OutType.Type.TROJAN,
+    override val type: String = OutType.TROJAN,
     override val tag: String,
     val server: String,
     @SerialName("server_port")

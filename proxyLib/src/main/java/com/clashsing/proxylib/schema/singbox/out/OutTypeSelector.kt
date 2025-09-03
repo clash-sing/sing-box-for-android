@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 @Parcelize
 @Serializable
 data class OutTypeSelector(
-    override val type: String = OutType.Type.SELECTOR,
+    override val type: String = OutType.SELECTOR,
     override val tag: String,
     val outbounds: List<String> = emptyList(),
 ) : OutType, Parcelable
