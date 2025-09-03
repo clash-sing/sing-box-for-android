@@ -12,6 +12,7 @@ data class Dns(
     val rules: List<DnsRule> = emptyList(),
     @SerialName("independent_cache")
     val independentCache: Boolean = false,
+    /** @see [DnsServerTypeHttps.tag] */
     val final: String = DnsServerType.HTTPS,
     val strategy: String = PREFER_IPV6
 ) : Parcelable {
