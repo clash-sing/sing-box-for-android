@@ -1,4 +1,4 @@
-package com.clashsing.proxylib.schema.singbox.outbounds
+package com.clashsing.proxylib.schema.singbox.out
 
 
 interface OutType {

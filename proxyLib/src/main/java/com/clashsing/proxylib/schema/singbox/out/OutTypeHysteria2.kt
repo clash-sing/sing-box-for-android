@@ -1,4 +1,4 @@
-package com.clashsing.proxylib.schema.singbox.outbounds
+package com.clashsing.proxylib.schema.singbox.out
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
@@ -7,13 +7,15 @@ import kotlinx.serialization.Serializable
 
 @Parcelize
 @Serializable
-data class OutTypeTrojan(
+data class OutTypeHysteria2(
     override val type: String = OutType.Type.HYSTERIA2,
     override val tag: String,
     val server: String,
     @SerialName("server_port")
     val serverPort: Int,
+    /** @sample: ["2080:3000"] */
+    @SerialName("server_ports")
+    val serverPorts: List<String> = emptyList(),
     val password: String,
-    val tls: TlsOut = TlsOut(),
-    val transport: Transport = Transport()
+    val tls: TlsOut = TlsOut().copy(alpn = listOf("h3"))
 ) : OutType, Parcelable
