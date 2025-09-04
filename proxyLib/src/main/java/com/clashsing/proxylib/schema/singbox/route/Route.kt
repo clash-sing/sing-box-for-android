@@ -9,7 +9,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Route(
     val rules: List<RuleAction>,
-    val ruleSet: List<RuleSet>,
+    val ruleSet: List<RuleSetData>,
 
     /** 默认出站标签。如果为空，将使用第一个可用于对应协议的出站。 */
     val final: String? = null,
