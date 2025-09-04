@@ -1,11 +1,8 @@
 package com.clashsing.proxylib.schema.singbox
 
-import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-@Parcelize
 @Serializable
 data class Route(
     val rules: List<RouteRule>,
@@ -29,4 +26,4 @@ data class Route(
     @SerialName("default_domain_resolver")
     val defaultDomainResolver: String = "system"
 
-) : Parcelable
+)

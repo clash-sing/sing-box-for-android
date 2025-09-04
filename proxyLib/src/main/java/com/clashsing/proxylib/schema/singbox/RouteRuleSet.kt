@@ -1,17 +1,14 @@
 package com.clashsing.proxylib.schema.singbox
 
-import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 
-@Parcelize
 @Serializable
 data class RouteRuleSet(
     val type: String,
     val tag: String,
     val format: String,
     val url: String,
-) : Parcelable {
+) {
     object Type {
         const val INLINE = "inline"
         const val LOCAL = "local"

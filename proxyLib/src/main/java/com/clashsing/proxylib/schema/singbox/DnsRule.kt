@@ -1,11 +1,8 @@
 package com.clashsing.proxylib.schema.singbox
 
-import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-@Parcelize
 @Serializable
 data class DnsRule(
 
@@ -30,7 +27,7 @@ data class DnsRule(
     @SerialName("query_type")
     val queryType: List<String>? = null,
 
-    ) : Parcelable {
+    ) {
     companion object {
         const val GEOIP_CN = "geoip-cn"
         const val GEOSITE_CN = "geosite-cn"

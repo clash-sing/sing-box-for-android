@@ -1,11 +1,10 @@
 package com.clashsing.proxylib.schema.singbox
 
-import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
+import com.clashsing.proxylib.schema.StringOrStringList
+import com.clashsing.proxylib.schema.StringOrStringListSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-@Parcelize
 @Serializable
 data class RouteRule(
     /** @see [Action] */
@@ -32,9 +31,10 @@ data class RouteRule(
     @SerialName("no_drop")
     val noDrop: Boolean? = null,
 
+    @Serializable(with = StringOrStringListSerializer::class)
     @SerialName("protocol")
-    val protocols: List<String>? = null
-) : Parcelable {
+    val protocols: StringOrStringList? = null
+) {
     companion object {
         fun createRoute(outbound: String, clashMode: String?, ruleSet: List<String> = listOf(
             RouteRuleSet.Tag.GEOIP_CN, RouteRuleSet.Tag.GEOSITE_CN), ipIsPrivate: Boolean? = null,
@@ -42,10 +42,22 @@ data class RouteRule(
             clashMode = clashMode, ruleSet = ruleSet, ipIsPrivate = ipIsPrivate)
         fun createSniff(): RouteRule = RouteRule(action = Action.SNIFF)
         fun createReject(method: String = Method.DEFAULT, noDrop: Boolean? = null,
-                         protocols: List<String> = listOf(Protocol.QUIC)): RouteRule = RouteRule(
+                         protocols: StringOrStringList = StringOrStringList.ListValue(
+                             listOf(
+                                 Protocol.QUIC
+                             )
+                         )
+        ): RouteRule = RouteRule(
             action = Action.REJECT, method = method, noDrop = noDrop, protocols = protocols)
-        fun createHijackDns(protocol: List<String> = listOf(Protocol.DNS)): RouteRule = RouteRule(
-            action = Action.HIJACK_DNS, protocols = protocol)
+        fun createHijackDns(protocols: StringOrStringList = StringOrStringList.ListValue(listOf(Protocol.DNS))): RouteRule = RouteRule(
+            action = Action.HIJACK_DNS, protocols = protocols)
+
+        fun getStringList(value: StringOrStringList): List<String> {
+            return when (value) {
+                is StringOrStringList.StringValue -> listOf(value.value)
+                is StringOrStringList.ListValue -> value.value
+            }
+        }
     }
 
     object Action {

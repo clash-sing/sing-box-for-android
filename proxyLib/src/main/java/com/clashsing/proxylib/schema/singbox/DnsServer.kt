@@ -1,11 +1,8 @@
 package com.clashsing.proxylib.schema.singbox
 
-import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-@Parcelize
 @Serializable
 data class DnsServer(
     /** @see: [Type] */
@@ -15,16 +12,16 @@ data class DnsServer(
     val tag: String,
 
     /** @see: [ALI_DNS] */
-    val server: String,
+    val server: String? = null,
 
     /** @see: [InetRange] */
     @SerialName("inet4_range")
-    val inet4Range: String,
+    val inet4Range: String? =  null,
 
     /** @see: [InetRange] */
     @SerialName("inet6_range")
-    val inet6Range: String
-) : Parcelable {
+    val inet6Range: String? = null,
+) {
     companion object {
         const val ALI_DNS = "223.5.5.5"
     }

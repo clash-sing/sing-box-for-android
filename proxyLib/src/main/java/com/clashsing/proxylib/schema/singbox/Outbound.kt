@@ -1,11 +1,8 @@
 package com.clashsing.proxylib.schema.singbox
 
-import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-@Parcelize
 @Serializable
 data class Outbound(
     /** @see [Type] */
@@ -64,7 +61,7 @@ data class Outbound(
     val tls: Tls? = null,
     val transport: Transport? = null
 
-) : Parcelable {
+) {
     companion object {
         fun direct(tag: String = Type.DIRECT) = Outbound(
             type = Type.DIRECT,
@@ -161,7 +158,7 @@ data class Outbound(
         const val SELECTOR = "selector"
         const val URLTEST = "urltest"
     }
-    @Parcelize
+
     @Serializable
     data class Tls(
         val enabled: Boolean = true,
@@ -172,13 +169,13 @@ data class Outbound(
         val insecure: Boolean = false,
         val alpn: List<String> = emptyList(),
         val utls: Utls? = null
-    ) : Parcelable {
-        @Parcelize
+    ) {
+
         @Serializable
         data class Utls(
             val enabled: Boolean = true,
             val fingerprint: String = CHROME,
-        ) : Parcelable {
+        ) {
             companion object {
                 const val CHROME = "chrome"
                 const val FIREFOX = "firefox"
@@ -193,11 +190,10 @@ data class Outbound(
         }
     }
 
-    @Parcelize
     @Serializable
     data class Transport(
         val type: String = WEB_SOCKET,
-    ) : Parcelable {
+    ) {
         companion object {
             const val TYPE_HTTP = "http"
             const val WEB_SOCKET = "ws"

@@ -5,7 +5,6 @@ import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-@Parcelize
 @Serializable
 data class Inbound(
 
@@ -47,7 +46,7 @@ data class Inbound(
     val sniffOverrideDestination: Boolean? = null,
     val platform: Platform? = null
 
-) : Parcelable {
+) {
     companion object {
         fun createTun(
             tag: String = "tun",
@@ -112,12 +111,12 @@ data class Inbound(
         const val GVISOR = "gvisor"
         const val MIXED = "mixed"
     }
-    @Parcelize
+
     @Serializable
     data class Platform(
         @SerialName("http_proxy")
         val httpProxy: HttpProxy = HttpProxy(),
-    ) : Parcelable {
+    ) {
         @Parcelize
         @Serializable
         data class HttpProxy(

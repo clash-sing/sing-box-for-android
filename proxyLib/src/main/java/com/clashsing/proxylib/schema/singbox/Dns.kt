@@ -1,11 +1,8 @@
 package com.clashsing.proxylib.schema.singbox
 
-import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-@Parcelize
 @Serializable
 data class Dns(
     val servers: List<DnsServer>,
@@ -15,7 +12,7 @@ data class Dns(
     /** @see [DnsServer.Tag] */
     val final: String = DnsServer.Tag.ALIDOH_FOR_HTTPS,
     val strategy: String = Strategy.PREFER_IPV6
-) : Parcelable {
+) {
     object Strategy {
         const val PREFER_IPV4 = "prefer_ipv4"
         const val PREFER_IPV6 = "prefer_ipv6"
