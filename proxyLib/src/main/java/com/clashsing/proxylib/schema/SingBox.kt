@@ -1,9 +1,10 @@
-package com.clashsing.proxylib.schema.singbox
+package com.clashsing.proxylib.schema
 
 import android.os.Parcelable
 import com.clashsing.proxylib.schema.singbox.dns.Dns
 import com.clashsing.proxylib.schema.singbox.inbound.InType
 import com.clashsing.proxylib.schema.singbox.out.OutType
+import com.clashsing.proxylib.schema.singbox.route.Route
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -13,6 +14,7 @@ import kotlinx.serialization.Serializable
 data class SingBox(
     val dns: Dns,
     val inbounds: List<InType>,
+    val route: Route,
     val outbounds: List<OutType>,
     val experimental: Exp = Exp(),
     val log: Log = Log()
