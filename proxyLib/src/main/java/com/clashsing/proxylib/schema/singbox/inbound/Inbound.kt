@@ -27,6 +27,11 @@ data class Inbound(
     @SerialName("strict_route")
     val strictRoute: Boolean? = null,
 
+    val listen: String? = null,
+
+    @SerialName("listen_port")
+    val listenPort: Int? = null,
+
     /**
      * Deprecated, @see https://sing-box.sagernet.org/zh/migration/#_3
      */
@@ -66,6 +71,20 @@ data class Inbound(
                 sniff = sniff,
                 sniffOverrideDestination = sniffOverrideDestination,
                 platform = platform
+            )
+        }
+        fun createMixed(
+            tag: String = "mixed",
+            listen: String = "127.0.0.1",
+            listenPort: Int = 8890,
+            sniff: Boolean = true,
+        ) : Inbound {
+            return Inbound(
+                type = Type.MIXED,
+                tag = tag,
+                listen = listen,
+                listenPort = listenPort,
+                sniff = sniff
             )
         }
     }
