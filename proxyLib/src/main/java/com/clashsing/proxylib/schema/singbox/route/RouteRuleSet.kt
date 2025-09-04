@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 
 @Parcelize
 @Serializable
-data class RuleSetData(
+data class RouteRuleSet(
     val type: String,
     val tag: String,
     val format: String,

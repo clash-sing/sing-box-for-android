@@ -18,6 +18,6 @@ data class RuleActionRoute(
     companion object {
         const val CLASH_MODE_DIRECT = "direct"
         const val CLASH_MODE_GLOBAL = "global"
-        val defaultRuleSet = listOf(RuleSetData.Tag.GEOIP_CN, RuleSetData.Tag.GEOSITE_CN)
+        val defaultRuleSet = listOf(RouteRuleSet.Tag.GEOIP_CN, RouteRuleSet.Tag.GEOSITE_CN)
     }
 }
