@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 
 @Parcelize
 @Serializable
-data class SingBoxExperimental(
+data class SingBoxExp(
     @SerialName("cache_file")
     val cacheFile: CacheFile = CacheFile(),
 ) : Parcelable {

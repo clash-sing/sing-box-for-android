@@ -11,6 +11,6 @@ import kotlinx.serialization.Serializable
 data class SingBox(
     val dns: Dns,
     val outbounds: List<OutType>,
-    val experimental: SingBoxExperimental = SingBoxExperimental(),
+    val experimental: SingBoxExp = SingBoxExp(),
     val log: SingBoxLog = SingBoxLog()
 ) : Parcelable
