@@ -1,10 +1,10 @@
 package com.clashsing.proxylib.schema
 
 import android.os.Parcelable
-import com.clashsing.proxylib.schema.singbox.dns.Dns
-import com.clashsing.proxylib.schema.singbox.inbound.Inbound
-import com.clashsing.proxylib.schema.singbox.out.Outbound
-import com.clashsing.proxylib.schema.singbox.route.Route
+import com.clashsing.proxylib.schema.singbox.Dns
+import com.clashsing.proxylib.schema.singbox.Inbound
+import com.clashsing.proxylib.schema.singbox.Outbound
+import com.clashsing.proxylib.schema.singbox.Route
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

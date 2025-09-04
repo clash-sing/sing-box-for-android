@@ -1,4 +1,4 @@
-package com.clashsing.proxylib.schema.singbox.out
+package com.clashsing.proxylib.schema.singbox
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize

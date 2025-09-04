@@ -1,7 +1,6 @@
-package com.clashsing.proxylib.schema.singbox.dns
+package com.clashsing.proxylib.schema.singbox
 
 import android.os.Parcelable
-import com.clashsing.proxylib.schema.singbox.route.RouteRule
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

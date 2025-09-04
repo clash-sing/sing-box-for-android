@@ -1,4 +1,4 @@
-package com.clashsing.proxylib.schema.singbox.route
+package com.clashsing.proxylib.schema.singbox
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
@@ -17,7 +17,7 @@ data class RouteRule(
     /** @see [ClashMode] */
     val clashMode: String? = null,
 
-    /** @see [com.clashsing.proxylib.schema.singbox.out.Outbound.tag] */
+    /** @see [Outbound.tag] */
     val outbound: String? = null,
 
     /** @see [RouteRuleSet.tag] */
