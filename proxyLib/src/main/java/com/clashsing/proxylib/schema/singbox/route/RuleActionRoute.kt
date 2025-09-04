@@ -9,7 +9,7 @@ import kotlinx.serialization.Serializable
 data class RuleActionRoute(
     override val action: String = RuleAction.ROUTE,
     val clashMode: String? = null,
-    /** @see [com.clashsing.proxylib.schema.singbox.out.OutType.tag] */
+    /** @see [com.clashsing.proxylib.schema.singbox.out.Outbound.tag] */
     val outbound: String,
     val ruleSet: List<String>? = null,
     @SerialName("ip_is_private")
