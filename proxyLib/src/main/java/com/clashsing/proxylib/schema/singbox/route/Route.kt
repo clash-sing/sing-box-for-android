@@ -2,6 +2,7 @@ package com.clashsing.proxylib.schema.singbox.route
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Parcelize
@@ -9,10 +10,23 @@ import kotlinx.serialization.Serializable
 data class Route(
     val rules: List<RuleAction>,
     val ruleSet: List<RuleSet>,
-    val final: String? = null
 
-) : Parcelable {
-    init {
-        TODO ("未完成")
-    }
-}
+    /** 默认出站标签。如果为空，将使用第一个可用于对应协议的出站。 */
+    val final: String? = null,
+
+    /**
+     * 默认将出站连接绑定到默认网卡，以防止在 tun 下出现路由环路。
+     * 仅支持 Linux、Windows 和 macOS
+     * 如果设置了 outbound.bind_interface 设置，则不生效。
+     */
+    @SerialName("auto_detect_interface")
+    val autoDetectInterface: Boolean = true,
+
+    /**
+     * @see: https://sing-box.sagernet.org/configuration/shared/dial/#domain_resolver
+     * 可以被 outbound.domain_resolver 覆盖。
+     */
+    @SerialName("default_domain_resolver")
+    val defaultDomainResolver: String = "system"
+
+) : Parcelable
