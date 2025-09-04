@@ -15,5 +15,5 @@ data class RuleSetGeoIpCN(
     val format: String = "binary",
     val url: String = "https://testingcf.jsdelivr.net/gh/SagerNet/sing-geoip@rule-set/geoip-cn.srs",
     @SerialName("download_detour")
-    val downloadDetour: String = "direct"
+    val downloadDetour: String? = null
 ) : RuleSet
