@@ -9,7 +9,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class DnsRule(
     /**
-     * @see [DnsServerType.tag]
+     * @see [DnsServer.Tag]
      */
     val server: String,
     @SerialName("clash_mode")

@@ -1,12 +1,15 @@
 package io.nekohasekai.sfa.cs
 
+import android.util.Log
 import android.webkit.WebSettings
 import androidx.annotation.WorkerThread
+import com.clashsing.proxylib.schema.SingBox
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import io.nekohasekai.sfa.Application
 import io.nekohasekai.sfa.cs.parser.DefaultSubscriptionParserImpl
 import io.nekohasekai.sfa.utils.HTTPClient
+import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okio.BufferedSource
@@ -32,7 +35,16 @@ class ClashSingClient(val profileId: Long) : Closeable {
 
     @WorkerThread
     fun getString(url: String): String {
+//        try {
+//            val jsonStr = """{"type": "local", "tag": "system"}"""
+//            val dnsServerType = Json.decodeFromString<DnsServerType>(jsonStr)
+//            Log.d("ClashSingClient", "dnsServerType: $dnsServerType")
+//
+//        } catch (e: Exception) {
+//            Log.e("ClashSingClient", "",e)
+//        }
         val singBoxContent = HTTPClient().use { it.getString(url) }
+        val singBox = Json.decodeFromString<SingBox>(singBoxContent)
         val singBoxMap = try {
             val type: Type = object : TypeToken<Map<String, Any?>>(){}.type
             Gson().fromJson(singBoxContent, type)
