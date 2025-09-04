@@ -8,15 +8,15 @@ import kotlinx.serialization.Serializable
 @Parcelize
 @Serializable
 data class Dns(
-    val servers: List<DnsServer> = emptyList(),
-    val rules: List<DnsRule> = emptyList(),
+    val servers: List<DnsServer>,
+    val rules: List<DnsRule>,
     @SerialName("independent_cache")
     val independentCache: Boolean = false,
-    /** @see [DnsServer.Tag.ALIDOH_FOR_HTTPS] */
+    /** @see [DnsServer.Tag] */
     val final: String = DnsServer.Tag.ALIDOH_FOR_HTTPS,
-    val strategy: String = PREFER_IPV6
+    val strategy: String = Strategy.PREFER_IPV6
 ) : Parcelable {
-    companion object {
+    object Strategy {
         const val PREFER_IPV4 = "prefer_ipv4"
         const val PREFER_IPV6 = "prefer_ipv6"
         const val IPV4_ONLY = "ipv4_only"
