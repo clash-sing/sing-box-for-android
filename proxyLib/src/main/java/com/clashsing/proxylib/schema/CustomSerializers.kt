@@ -1,4 +1,5 @@
 package com.clashsing.proxylib.schema
+
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable

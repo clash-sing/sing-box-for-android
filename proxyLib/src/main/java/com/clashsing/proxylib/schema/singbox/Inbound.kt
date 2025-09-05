@@ -1,7 +1,5 @@
 package com.clashsing.proxylib.schema.singbox
 
-import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -117,14 +115,13 @@ data class Inbound(
         @SerialName("http_proxy")
         val httpProxy: HttpProxy = HttpProxy(),
     ) {
-        @Parcelize
         @Serializable
         data class HttpProxy(
             val enabled: Boolean = false,
             val server: String = "127.0.0.1",
             @SerialName("server_port")
             val serverPort: Int = 8890
-        ) : Parcelable
+        )
     }
 
 }
