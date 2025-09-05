@@ -2,6 +2,7 @@ package com.clashsing.proxylib.schema
 
 import com.clashsing.proxylib.BuildConfig
 import kotlinx.serialization.DeserializationStrategy
+import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.ListSerializer
@@ -15,7 +16,12 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonContentPolymorphicSerializer
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.decodeFromJsonElement
+import kotlinx.serialization.serializer
+import kotlin.reflect.KClass
 
 // 在您的依赖注入或者 Json 实例提供处
 val customJson = Json {
@@ -70,3 +76,53 @@ object StringOrStringListSerializer : JsonContentPolymorphicSerializer<StringOrS
         }
     }
 }
+
+
+fun <T> Json.decodeFromMap(map: Map<String, *>, deserializer: DeserializationStrategy<T>): T {
+    val jsonObject = map.toJsonObject()
+    return decodeFromJsonElement(deserializer, jsonObject)
+}
+
+@OptIn(InternalSerializationApi::class)
+fun <T> Json.decodeFromMap(map: Map<String, *>, clazz: KClass<T>): T
+        where T : Any {
+    return decodeFromMap(map, clazz.serializer())
+}
+
+/**
+* 将 Map<String, *> 安全转换为 JsonObject，支持嵌套结构
+*/
+fun Map<String, *>.toJsonObject(): JsonObject = JsonObject(
+    mapValues { (_, value) -> value.toJsonElement() }
+)
+
+private fun Any?.toJsonElement(): JsonElement = when (this) {
+    null -> JsonNull
+    is String -> JsonPrimitive(this)
+    is Number -> JsonPrimitive(this)
+    is Boolean -> JsonPrimitive(this)
+    is Char -> JsonPrimitive(this.toString())
+
+    is List<*> -> JsonArray(
+        mapNotNull { it.toJsonElement() }
+    )
+
+    is Map<*, *> -> {
+        // 确保 key 是 String 类型
+        @Suppress("UNCHECKED_CAST")
+        (this as? Map<String, Any?>)
+            ?.toJsonObject()
+            ?: JsonPrimitive(toString()) // 备用
+    }
+
+    else -> JsonPrimitive(toString())
+}
+
+/**
+ * 从 Map<String, *> 解码为指定数据类
+ */
+inline fun <reified T : Any> Json.decodeFromMap(map: Map<String, *>): T =
+    decodeFromJsonElement(map.toJsonObject())
+
+inline fun <reified T : Any> Json.decodeFromMap(map: Map<String, *>, noinline block: T.() -> Unit): T =
+    decodeFromMap<T>(map).apply(block)

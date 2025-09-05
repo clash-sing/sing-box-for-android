@@ -3,6 +3,8 @@ package io.nekohasekai.sfa.cs
 import android.util.Log
 import android.webkit.WebSettings
 import androidx.annotation.WorkerThread
+import com.clashsing.proxylib.parser.SubParser
+import com.clashsing.proxylib.parser.SubParserClash
 import com.clashsing.proxylib.schema.SingBox
 import com.clashsing.proxylib.schema.customJson
 import com.google.gson.Gson
@@ -36,29 +38,48 @@ class ClashSingClient(val profileId: Long) : Closeable {
     @WorkerThread
     fun getString(url: String): String {
         val singBoxContent = HTTPClient().use { it.getString(url) }
-        try {
-            val singBox = customJson.decodeFromString<SingBox>(singBoxContent)
-            Log.d("ClashSingClient", "singBox: $singBox")
-            val newSingBoxString =customJson.encodeToString(singBox)
-            Log.d("ClashSingClient", "newSingBoxString: $newSingBoxString")
-        } catch (e: Exception) {
-            Log.e("ClashSingClient", "",e)
-        }
-        val singBoxMap = try {
-            val type: Type = object : TypeToken<Map<String, Any?>>(){}.type
-            Gson().fromJson(singBoxContent, type)
-        } catch (e: Exception) {
-            emptyMap<String, Any?>()
-        }
+//        try {
+//            val singBox = customJson.decodeFromString<SingBox>(singBoxContent)
+//            Log.d("ClashSingClient", "singBox: $singBox")
+//            val newSingBoxString =customJson.encodeToString(singBox)
+//            Log.d("ClashSingClient", "newSingBoxString: $newSingBoxString")
+//        } catch (e: Exception) {
+//            Log.e("ClashSingClient", "",e)
+//        }
+
+//        val singBoxMap = try {
+//            val type: Type = object : TypeToken<Map<String, Any?>>(){}.type
+//            Gson().fromJson(singBoxContent, type)
+//        } catch (e: Exception) {
+//            emptyMap<String, Any?>()
+//        }
+        var subParser: SubParser? = null
         val resultWrapper = runCatching {
             getClashSingString(url)
         }
         if (resultWrapper.isSuccess) {
-            val mapClashSing = Yaml().load<Map<String, Any?>>(resultWrapper.getOrNull()?.content)
-            val parser = DefaultSubscriptionParserImpl(singBoxMap, mapClashSing)
-            parser.setSubscriptionUserinfo(profileId, resultWrapper.getOrNull()!!)
-            val newContent = parser.getFixedContent()
-            return newContent
+            val resultYaml = runCatching {
+                val content = resultWrapper.getOrNull()?.content ?: throw Exception("Response body is null.")
+                Yaml().load<Any>(content)
+                content
+            }
+            if (resultYaml.isSuccess) {
+                subParser = SubParserClash(resultWrapper.getOrNull()!!.content, resultWrapper.getOrNull()!!.headers)
+            } else {
+
+            }
+            val singBox = subParser?.getSingBox()
+            return if (singBox != null) {
+                subParser.getSubUserInfo()
+                customJson.encodeToString(singBox)
+            } else {
+                singBoxContent
+            }
+
+//            val mapClashSing = Yaml().load<Map<String, Any?>>(resultWrapper.getOrNull()?.content)
+//            val parser = DefaultSubscriptionParserImpl(singBoxMap, mapClashSing)
+//            parser.setSubscriptionUserinfo(profileId, resultWrapper.getOrNull()!!)
+//            val newContent = parser.getFixedContent()
         } else {
             return singBoxContent
         }
@@ -83,7 +104,7 @@ class ClashSingClient(val profileId: Long) : Closeable {
             it.readAll(buffer)
             buffer.readString(response.body.contentType()?.charset() ?: Charsets.UTF_8)
         }
-        return ClashSingWrapper(csContent.trim(), response.headers)
+        return ClashSingWrapper(csContent, response.headers)
     }
 
     private fun getUserAgent(): String {
