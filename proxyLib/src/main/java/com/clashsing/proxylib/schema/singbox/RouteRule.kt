@@ -14,12 +14,14 @@ data class RouteRule(
     val mode: String = Mode.AND,
 
     /** @see [ClashMode] */
+    @SerialName("clash_mode")
     val clashMode: String? = null,
 
     /** @see [Outbound.tag] */
     val outbound: String? = null,
 
     /** @see [RouteRuleSet.tag] */
+    @SerialName("rule_set")
     val ruleSet: List<String>? = null,
 
     @SerialName("ip_is_private")

@@ -1,5 +1,6 @@
 package com.clashsing.proxylib.schema.singbox
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -8,6 +9,13 @@ data class RouteRuleSet(
     val tag: String,
     val format: String,
     val url: String,
+
+    /**
+     * 用于下载规则集的出站的标签。如果为空，将使用默认出站。
+     * @see Outbound.tag
+     */
+    @SerialName("download_detour")
+    val downloadDetour: String? = null,
 ) {
     object Type {
         const val INLINE = "inline"

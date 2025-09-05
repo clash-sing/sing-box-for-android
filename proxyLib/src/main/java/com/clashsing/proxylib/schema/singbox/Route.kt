@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Route(
     val rules: List<RouteRule>,
+    @SerialName("rule_set")
     val ruleSet: List<RouteRuleSet>,
 
     /** 默认出站标签。如果为空，将使用第一个可用于对应协议的出站。 */

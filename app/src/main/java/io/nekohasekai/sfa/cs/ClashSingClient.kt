@@ -4,6 +4,7 @@ import android.util.Log
 import android.webkit.WebSettings
 import androidx.annotation.WorkerThread
 import com.clashsing.proxylib.schema.SingBox
+import com.clashsing.proxylib.schema.myJson
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import io.nekohasekai.sfa.Application
@@ -44,7 +45,12 @@ class ClashSingClient(val profileId: Long) : Closeable {
 //            Log.e("ClashSingClient", "",e)
 //        }
         val singBoxContent = HTTPClient().use { it.getString(url) }
-        val singBox = Json.decodeFromString<SingBox>(singBoxContent)
+        try {
+            val singBox = myJson.decodeFromString<SingBox>(singBoxContent)
+            Log.d("ClashSingClient", "singBox: $singBox")
+        } catch (e: Exception) {
+            Log.e("ClashSingClient", "",e)
+        }
         val singBoxMap = try {
             val type: Type = object : TypeToken<Map<String, Any?>>(){}.type
             Gson().fromJson(singBoxContent, type)
