@@ -4,13 +4,12 @@ import android.util.Log
 import android.webkit.WebSettings
 import androidx.annotation.WorkerThread
 import com.clashsing.proxylib.schema.SingBox
-import com.clashsing.proxylib.schema.myJson
+import com.clashsing.proxylib.schema.customJson
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import io.nekohasekai.sfa.Application
 import io.nekohasekai.sfa.cs.parser.DefaultSubscriptionParserImpl
 import io.nekohasekai.sfa.utils.HTTPClient
-import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okio.BufferedSource
@@ -46,7 +45,7 @@ class ClashSingClient(val profileId: Long) : Closeable {
 //        }
         val singBoxContent = HTTPClient().use { it.getString(url) }
         try {
-            val singBox = myJson.decodeFromString<SingBox>(singBoxContent)
+            val singBox = customJson.decodeFromString<SingBox>(singBoxContent)
             Log.d("ClashSingClient", "singBox: $singBox")
         } catch (e: Exception) {
             Log.e("ClashSingClient", "",e)

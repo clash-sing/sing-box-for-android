@@ -16,7 +16,7 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonPrimitive
 
 // 在您的依赖注入或者 Json 实例提供处
-val myJson = Json {
+val customJson = Json {
     ignoreUnknownKeys = true // 关键配置
     // 其他您可能需要的配置，例如：
     // encodeDefaults = true
