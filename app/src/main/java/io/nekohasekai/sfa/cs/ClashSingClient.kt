@@ -47,6 +47,8 @@ class ClashSingClient(val profileId: Long) : Closeable {
         try {
             val singBox = customJson.decodeFromString<SingBox>(singBoxContent)
             Log.d("ClashSingClient", "singBox: $singBox")
+            val newSingBoxString =customJson.encodeToString(singBox)
+            Log.d("ClashSingClient", "newSingBoxString: $newSingBoxString")
         } catch (e: Exception) {
             Log.e("ClashSingClient", "",e)
         }

@@ -1,5 +1,6 @@
 package com.clashsing.proxylib.schema
 
+import com.clashsing.proxylib.BuildConfig
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
@@ -18,11 +19,11 @@ import kotlinx.serialization.json.JsonPrimitive
 
 // 在您的依赖注入或者 Json 实例提供处
 val customJson = Json {
-    ignoreUnknownKeys = true // 关键配置
-    // 其他您可能需要的配置，例如：
-    // encodeDefaults = true
+    ignoreUnknownKeys = true
+    encodeDefaults = true
+    explicitNulls = false
+    if (BuildConfig.DEBUG) prettyPrint = true // 通常在生产中设为 false 以减少输出大小
     // isLenient = true // 用于处理不严格的 JSON 格式
-    // prettyPrint = false // 通常在生产中设为 false 以减少输出大小
 }
 
 @Serializable
