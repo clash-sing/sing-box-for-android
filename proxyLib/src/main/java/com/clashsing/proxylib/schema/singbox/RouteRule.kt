@@ -10,9 +10,6 @@ data class RouteRule(
     /** @see [Action] */
     val action: String = Action.ROUTE,
 
-    /** @see [Mode] */
-    val mode: String = Mode.AND,
-
     /** @see [ClashMode] */
     @SerialName("clash_mode")
     val clashMode: String? = null,
@@ -70,10 +67,18 @@ data class RouteRule(
         const val SNIFF = "sniff"
         const val RESOLVE = "resolve"
     }
+
+    /**
+     * @deprecated sing-box 文档表述错误，route.rule 和 dns.rule 不能有这个属性。
+     * @see: https://sing-box.sagernet.org/zh/configuration/route/rule/#mode
+     * @see: https://sing-box.sagernet.org/zh/configuration/dns/rule/#mode
+     */
+    @Deprecated("sing-box 文档表述错误，route.rule 和 dns.rule 不能有这个属性。")
     object Mode {
         const val AND = "and"
         const val OR = "or"
     }
+
     object ClashMode {
         const val DIRECT = "direct"
         const val GLOBAL = "global"

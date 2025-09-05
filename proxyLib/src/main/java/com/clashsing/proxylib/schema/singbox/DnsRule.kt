@@ -9,9 +9,6 @@ data class DnsRule(
     /** @see [RouteRule.Action] */
     val action: String = RouteRule.Action.ROUTE,
 
-    /** @see [RouteRule.Mode] */
-    val mode: String = RouteRule.Mode.AND,
-
     /**
      * @see [DnsServer.Tag]
      */
