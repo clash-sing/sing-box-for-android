@@ -35,14 +35,6 @@ class ClashSingClient(val profileId: Long) : Closeable {
 
     @WorkerThread
     fun getString(url: String): String {
-//        try {
-//            val jsonStr = """{"type": "local", "tag": "system"}"""
-//            val dnsServerType = Json.decodeFromString<DnsServerType>(jsonStr)
-//            Log.d("ClashSingClient", "dnsServerType: $dnsServerType")
-//
-//        } catch (e: Exception) {
-//            Log.e("ClashSingClient", "",e)
-//        }
         val singBoxContent = HTTPClient().use { it.getString(url) }
         try {
             val singBox = customJson.decodeFromString<SingBox>(singBoxContent)
