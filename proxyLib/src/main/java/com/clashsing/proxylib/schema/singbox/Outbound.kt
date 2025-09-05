@@ -167,7 +167,7 @@ data class Outbound(
         @SerialName("server_name")
         val serverName: String = "",
         val insecure: Boolean = false,
-        val alpn: List<String> = emptyList(),
+        val alpn: List<String>? = null,
         val utls: Utls? = null
     ) {
 
