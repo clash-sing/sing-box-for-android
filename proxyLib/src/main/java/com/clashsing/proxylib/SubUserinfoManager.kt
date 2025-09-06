@@ -27,13 +27,13 @@ object SubUserinfoManager {
 @Serializable
 data class SubUserinfo(
     /** 当月使用量，单位：Byte */
-    val usedBytes: Long?,
+    val usedBytes: Long? = null,
     /** 每月限额，单位：Byte */
-    val totalBytes: Long?,
+    val totalBytes: Long? = null,
     /** 订阅到期日 */
-    val expireTimestamp: Long?,
+    val expireTimestamp: Long? = null,
     /** 代理服务提供商的网址 */
-    val spUrl: String?,
+    val spUrl: String? = null,
     /** 代理服务提供商的名称 */
-    val spDisposition: String?
+    val spDisposition: String? = null
 )
