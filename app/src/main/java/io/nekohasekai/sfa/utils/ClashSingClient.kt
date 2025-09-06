@@ -1,5 +1,6 @@
 package io.nekohasekai.sfa.utils
 
+import android.util.Log
 import android.webkit.WebSettings
 import androidx.annotation.WorkerThread
 import com.clashsing.proxylib.SubUserinfoManager
@@ -40,20 +41,21 @@ class ClashSingClient(val profileId: Long) : Closeable {
         }
         if (resultClashSing.isSuccess) {
             val clashSingContent = resultClashSing.getOrNull()?.content ?: throw Exception("Response body is null.")
-            val resultYaml: Result<Map<String, Any?>> = runCatching {
-                Yaml().load(clashSingContent)
-            }
-            if (resultYaml.isSuccess) {
-                subParser = SubParserClash(
-                    resultClashSing.getOrNull()!!.content,
-                    resultClashSing.getOrNull()!!.headers
-                )
-            } else {
-                if (clashSingContent.endsWith("=")) {
-                    subParser = SubParserRocket(
-                        clashSingContent,
-                        resultClashSing.getOrNull()!!.headers
-                    )
+            val headers = resultClashSing.getOrNull()?.headers ?: throw Exception("Response headers is null.")
+            val firstLine = clashSingContent.lineSequence().first()
+            if (firstLine.startsWith("{")) { // Json
+                return singBoxContent
+            } else if (firstLine.contains(":")) { // Yaml
+                try {
+                    subParser = SubParserClash(clashSingContent, headers)
+                } catch (e: Exception) {
+                    Log.e("ClashSingClient", "Yaml decode failed.", e)
+                }
+            } else { // Base64
+                try {
+                    subParser = SubParserRocket(clashSingContent, headers)
+                } catch (e: Exception) {
+                    Log.e("ClashSingClient", "Base64 decode failed.", e)
                 }
             }
             val singBox = subParser?.getSingBox()
