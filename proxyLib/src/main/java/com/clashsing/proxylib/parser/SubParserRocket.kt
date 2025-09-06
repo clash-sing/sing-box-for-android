@@ -115,9 +115,12 @@ class SubParserRocket(srcContent: String, headers: Headers) : SubParser(srcConte
         }
     }
 
+    /**
+     * @sample:
+     *      原值：STATUS=🚀↑:0.58GB,↓:4.31GB,TOT:200GB💡Expires:2026-04-30
+     *      Encode：STATUS%3D%F0%9F%9A%80%E2%86%91%3A0.58GB%2C%E2%86%93%3A4.31GB%2CTOT%3A200GB%F0%9F%92%A1Expires%3A2026-04-30
+     */
     override fun getSubUserInfo(): SubUserinfo? {
-        // STATUS=🚀↑:0.58GB,↓:4.31GB,TOT:200GB💡Expires:2026-04-30
-        // STATUS%3D%F0%9F%9A%80%E2%86%91%3A0.58GB%2C%E2%86%93%3A4.31GB%2CTOT%3A200GB%F0%9F%92%A1Expires%3A2026-04-30
         if (statusLine == null) {
             statusLine = decodeContent?.lineSequence()?.firstOrNull { line ->
                 line.uppercase().startsWith("STATUS")
