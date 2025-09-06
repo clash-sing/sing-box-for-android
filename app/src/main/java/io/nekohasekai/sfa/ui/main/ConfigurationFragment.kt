@@ -220,27 +220,25 @@ class ConfigurationFragment : Fragment() {
                     DateFormat.getDateTimeInstance().format(profile.typed.lastUpdated)
                 )
                 SubUserinfoManager.getUserinfo(profile.id)?.let { userinfo ->
-                    if (userinfo.usedBytes != null || userinfo.totalBytes != null || userinfo.expireTimestamp != null || userinfo.spUrl.isNotBlank()) {
-                        binding.profileUserinfo.isVisible = true
-                        if (userinfo.usedBytes != null || userinfo.totalBytes != null) {
-                            var usedText = ""
-                            userinfo.usedBytes?.let {
-                                usedText = "%.2f".format(it / 1024.0f / 1024.0f / 1024.0f ) + " GB"
-                            }
-                            userinfo.totalBytes?.let {
-                                if (usedText.isNotBlank()) usedText += " / "
-                                usedText += "%.0f".format(it / 1024.0f / 1024.0f / 1024.0f ) + " GB"
-                            }
-                            binding.profileUsed.text = usedText
+                    binding.profileUserinfo.isVisible = true
+                    if (userinfo.usedBytes != null || userinfo.totalBytes != null) {
+                        var usedText = ""
+                        userinfo.usedBytes?.let {
+                            usedText = "%.2f".format(it / 1024.0f / 1024.0f / 1024.0f ) + " GB"
                         }
-                        userinfo.expireTimestamp?.let {
-                            val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-                            binding.profileExpire.text = sdf.format(it)
+                        userinfo.totalBytes?.let {
+                            if (usedText.isNotBlank()) usedText += " / "
+                            usedText += "%.0f".format(it / 1024.0f / 1024.0f / 1024.0f ) + " GB"
                         }
-                        if (userinfo.spUrl.isNotBlank()) {
-                            binding.profileUrl.isVisible = true
-                            binding.profileUrl.text = userinfo.spUrl
-                        }
+                        binding.profileUsed.text = usedText
+                    }
+                    userinfo.expireTimestamp?.let {
+                        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                        binding.profileExpire.text = sdf.format(it)
+                    }
+                    if (!userinfo.spUrl.isNullOrBlank() || !userinfo.spDisposition.isNullOrBlank()) {
+                        binding.profileUrl.isVisible = true
+                        binding.profileUrl.text = userinfo.spUrl ?: userinfo.spDisposition
                     }
                 }
             } else {

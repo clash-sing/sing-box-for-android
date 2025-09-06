@@ -190,11 +190,12 @@ class SubParserClash(srcContent: String, headers: Headers) : SubParser(srcConten
                 }
             }
         }
-        val profileWebPageUrl: String = headers[PROFILE_WEB_PAGE_URL] ?: ""
-        val contentDisposition: String = headers[CONTENT_DISPOSITION]?.let { disposition ->
+        val profileWebPageUrl: String? = headers[PROFILE_WEB_PAGE_URL]
+        val contentDisposition: String? = headers[CONTENT_DISPOSITION]?.let { disposition ->
             disposition.split("''", ignoreCase = true).takeIf { it.size == 2 }?.get(1)
-        } ?: ""
-        if (usedBytes == null && totalBytes == null && expireTimestamp == null && profileWebPageUrl.isBlank() && contentDisposition.isBlank()) return null
+        }
+        if (usedBytes == null && totalBytes == null && expireTimestamp == null
+            && profileWebPageUrl.isNullOrBlank() && contentDisposition.isNullOrBlank()) return null
         return SubUserinfo(
             usedBytes = usedBytes,
             totalBytes = totalBytes,

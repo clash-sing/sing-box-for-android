@@ -33,7 +33,7 @@ data class SubUserinfo(
     /** 订阅到期日 */
     val expireTimestamp: Long?,
     /** 代理服务提供商的网址 */
-    val spUrl: String = "",
+    val spUrl: String?,
     /** 代理服务提供商的名称 */
-    val spDisposition: String = ""
+    val spDisposition: String?
 )
