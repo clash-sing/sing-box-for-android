@@ -10,7 +10,7 @@ data class Inbound(
     val type: String,
     val tag: String,
     val address: List<String>? = null,
-    val mtu: Int? = null,
+    val mtu: Long? = null,
 
     /**
      * TCP/IP 栈
@@ -27,7 +27,7 @@ data class Inbound(
     val listen: String? = null,
 
     @SerialName("listen_port")
-    val listenPort: Int? = null,
+    val listenPort: Long? = null,
 
     /**
      * Deprecated, @see https://sing-box.sagernet.org/zh/migration/#_3
@@ -49,7 +49,7 @@ data class Inbound(
         fun createTun(
             tag: String = "tun",
             address: List<String> = listOf("172.19.0.1/30", "fdfe:dcba:9876::1/126"),
-            mtu: Int = 9000,
+            mtu: Long = 9000,
             stack: String = Stack.SYSTEM,
             autoRoute: Boolean = true,
             strictRoute: Boolean = true,
@@ -73,7 +73,7 @@ data class Inbound(
         fun createMixed(
             tag: String = "mixed",
             listen: String = "127.0.0.1",
-            listenPort: Int = 8890,
+            listenPort: Long = 8890,
             sniff: Boolean = true,
         ) : Inbound {
             return Inbound(
@@ -120,7 +120,7 @@ data class Inbound(
             val enabled: Boolean = false,
             val server: String = "127.0.0.1",
             @SerialName("server_port")
-            val serverPort: Int = 8890
+            val serverPort: Long = 8890
         )
     }
 

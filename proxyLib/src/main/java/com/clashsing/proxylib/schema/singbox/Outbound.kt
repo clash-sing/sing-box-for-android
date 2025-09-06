@@ -32,12 +32,12 @@ data class Outbound(
      * 以毫秒为单位的测试容差。 默认使用 50
      * 仅当 [type] = [Type.URLTEST] 时有效
      */
-    val tolerance: Int? = null,
+    val tolerance: Long? = null,
 
     val server: String? = null,
 
     @SerialName("server_port")
-    val serverPort: Int? = null,
+    val serverPort: Long? = null,
 
     /** @sample: ["2080:3000"] */
     @SerialName("server_ports")
@@ -49,10 +49,10 @@ data class Outbound(
     val authStr: String? = null,
 
     @SerialName("up_mbps")
-    val upMbps: Int? = null,
+    val upMbps: Long? = null,
 
     @SerialName("down_mbps")
-    val downMbps: Int? = null,
+    val downMbps: Long? = null,
 
     /** 强制为 Linux 和 Windows 以外的系统启用 */
     @SerialName("disable_mtu_discovery")
@@ -78,7 +78,7 @@ data class Outbound(
         )
         fun urltest(tag: String = Type.URLTEST, outbounds: MutableList<String>,
                     url: String = "https://www.gstatic.com/generate_204", interval: String = "3m",
-                    tolerance: Int = 50) = Outbound(
+                    tolerance: Long = 50) = Outbound(
             type = Type.URLTEST,
             tag = tag,
             outbounds = outbounds,
@@ -86,7 +86,7 @@ data class Outbound(
             interval = interval,
             tolerance = tolerance
         )
-        fun trojan(tag: String, server: String, serverPort: Int, password: String,
+        fun trojan(tag: String, server: String, serverPort: Long, password: String,
                    tls: Tls = Tls(enabled = true, disableSni = true, serverName = "", insecure = true),
                    transport: Transport = Transport()) = Outbound(
             type = Type.TROJAN,
@@ -97,8 +97,8 @@ data class Outbound(
             tls = tls,
             transport = transport
         )
-        fun hysteria(tag: String, server: String, serverPort: Int, serverPorts: List<String>,
-                    upMbps: Int = 100, downMbps: Int = 100, authStr: String, disableMtuDiscovery: Boolean = true,
+        fun hysteria(tag: String, server: String, serverPort: Long, serverPorts: List<String>,
+                    upMbps: Long = 100, downMbps: Long = 100, authStr: String, disableMtuDiscovery: Boolean = true,
                      tls: Tls = Tls(enabled = true, disableSni = true,
                          serverName = "", insecure = true, alpn = listOf("h3"))) = Outbound(
             type = Type.HYSTERIA,
@@ -112,8 +112,8 @@ data class Outbound(
             disableMtuDiscovery = disableMtuDiscovery,
             tls = tls
         )
-        fun hysteria2(tag: String, server: String, serverPort: Int, serverPorts: List<String>,
-                      upMbps: Int? = null, downMbps: Int? = null, password: String,
+        fun hysteria2(tag: String, server: String, serverPort: Long, serverPorts: List<String>,
+                      upMbps: Long? = null, downMbps: Long? = null, password: String,
                       tls: Tls = Tls(enabled = true, disableSni = true,
                           serverName = "", insecure = true, alpn = listOf("h3"))) = Outbound(
             type = Type.HYSTERIA2,
@@ -126,7 +126,7 @@ data class Outbound(
             password = password,
             tls = tls
         )
-        fun anyTls(tag: String, server: String, serverPort: Int, password: String,
+        fun anyTls(tag: String, server: String, serverPort: Long, password: String,
                    tls: Tls = Tls(enabled = true, disableSni = false,
                          serverName = "", insecure = true, utls = Tls.Utls())) = Outbound(
             type = Type.ANYTLS,

@@ -89,7 +89,7 @@ class SubParserClash(srcContent: String, headers: Headers) : SubParser(srcConten
             Outbound.Type.HYSTERIA2 -> Outbound.hysteria2(
                 tag = proxy.name,
                 server = proxy.server,
-                serverPort = proxy.port.toInt(),
+                serverPort = proxy.port,
                 serverPorts = listOf((proxy.ports ?: "").replace("-", ":")),
                 upMbps = null,
                 downMbps = null,
@@ -105,10 +105,10 @@ class SubParserClash(srcContent: String, headers: Headers) : SubParser(srcConten
             Outbound.Type.HYSTERIA -> Outbound.hysteria(
                 tag = proxy.name,
                 server = proxy.server,
-                serverPort = proxy.port.toInt(),
+                serverPort = proxy.port,
                 serverPorts = listOf((proxy.ports ?: "").replace("-", ":")),
-                upMbps = proxy.up?.toInt() ?: 100,
-                downMbps = proxy.down?.toInt() ?: 100,
+                upMbps = proxy.up ?: 100,
+                downMbps = proxy.down ?: 100,
                 authStr = proxy.authStr!!,
                 disableMtuDiscovery = proxy.disableMtuDiscovery ?: true,
                 tls = Outbound.Tls(
@@ -122,7 +122,7 @@ class SubParserClash(srcContent: String, headers: Headers) : SubParser(srcConten
             Outbound.Type.TROJAN -> Outbound.trojan(
                 tag = proxy.name,
                 server = proxy.server,
-                serverPort = proxy.port.toInt(),
+                serverPort = proxy.port,
                 password = proxy.password!!,
                 tls = Outbound.Tls(
                     enabled = true,
@@ -137,7 +137,7 @@ class SubParserClash(srcContent: String, headers: Headers) : SubParser(srcConten
             Outbound.Type.ANYTLS -> Outbound.anyTls(
                 tag = proxy.name,
                 server = proxy.server,
-                serverPort = proxy.port.toInt(),
+                serverPort = proxy.port,
                 password = proxy.password!!,
                 tls = Outbound.Tls(
                     enabled = true,
