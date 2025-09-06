@@ -1,4 +1,4 @@
-package io.nekohasekai.sfa.cs
+package io.nekohasekai.sfa.utils
 
 import android.webkit.WebSettings
 import androidx.annotation.WorkerThread
@@ -7,16 +7,16 @@ import com.clashsing.proxylib.parser.SubParser
 import com.clashsing.proxylib.parser.SubParserClash
 import com.clashsing.proxylib.schema.customJson
 import io.nekohasekai.sfa.Application
-import io.nekohasekai.sfa.utils.HTTPClient
+import okhttp3.Headers
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okio.Buffer
 import okio.BufferedSource
 import okio.GzipSource
 import okio.buffer
 import org.yaml.snakeyaml.Yaml
 import java.io.Closeable
 import java.util.concurrent.TimeUnit
-import kotlin.io.use
 
 class ClashSingClient(val profileId: Long) : Closeable {
     companion object {
@@ -44,7 +44,10 @@ class ClashSingClient(val profileId: Long) : Closeable {
                 content
             }
             if (resultYaml.isSuccess) {
-                subParser = SubParserClash(resultWrapper.getOrNull()!!.content, resultWrapper.getOrNull()!!.headers)
+                subParser = SubParserClash(
+                    resultWrapper.getOrNull()!!.content,
+                    resultWrapper.getOrNull()!!.headers
+                )
             } else {
 
             }
@@ -78,7 +81,7 @@ class ClashSingClient(val profileId: Long) : Closeable {
             source
         }
         val csContent = gzipSource.buffer().use<BufferedSource, String> {
-            val buffer = okio.Buffer()
+            val buffer = Buffer()
             it.readAll(buffer)
             buffer.readString(response.body.contentType()?.charset() ?: Charsets.UTF_8)
         }
@@ -87,7 +90,7 @@ class ClashSingClient(val profileId: Long) : Closeable {
 
     private fun getUserAgent(): String {
         val defaultUserAgent = try {
-            WebSettings.getDefaultUserAgent(Application.application)
+            WebSettings.getDefaultUserAgent(Application.Companion.application)
         } catch (e: Exception) {
             System.getProperty("http.agent") ?: ""
         }
@@ -99,4 +102,6 @@ class ClashSingClient(val profileId: Long) : Closeable {
         client.connectionPool.evictAll()
         client.cache?.close()
     }
+
+    private data class ClashSingWrapper(val content: String, val headers: Headers)
 }
