@@ -36,7 +36,7 @@ class ClashSingClient(val profileId: Long) : Closeable {
         .build()
 
     @WorkerThread
-    fun getString(url: String): String {
+    suspend fun getString(url: String): String {
         val singBoxContent = HTTPClient().use { it.getString(url) }
 //        try {
 //            val singBox = customJson.decodeFromString<SingBox>(singBoxContent)
@@ -60,7 +60,7 @@ class ClashSingClient(val profileId: Long) : Closeable {
         if (resultWrapper.isSuccess) {
             val resultYaml = runCatching {
                 val content = resultWrapper.getOrNull()?.content ?: throw Exception("Response body is null.")
-                Yaml().load<Any>(content)
+                Yaml().load<Map<String, Any?>>(content)
                 content
             }
             if (resultYaml.isSuccess) {
@@ -70,7 +70,7 @@ class ClashSingClient(val profileId: Long) : Closeable {
             }
             val singBox = subParser?.getSingBox()
             return if (singBox != null) {
-                subParser.getSubUserInfo()
+//                subParser.getSubUserInfo()
                 customJson.encodeToString(singBox)
             } else {
                 singBoxContent

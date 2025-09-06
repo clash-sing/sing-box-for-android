@@ -14,7 +14,7 @@ data class Outbound(
      * 出站群组
      * 仅当 [type] = [Type.SELECTOR] 或 [Type.URLTEST] 时有效
      */
-    val outbounds: List<String>? = null,
+    val outbounds: MutableList<String>? = null,
 
     /**
      * 测试地址
@@ -71,12 +71,12 @@ data class Outbound(
             type = Type.BLOCK,
             tag = tag
         )
-        fun selector(tag: String = Type.SELECTOR, outbounds: List<String>) = Outbound(
+        fun selector(tag: String = Type.SELECTOR, outbounds: MutableList<String>) = Outbound(
             type = Type.SELECTOR,
             tag = tag,
             outbounds = outbounds
         )
-        fun urltest(tag: String = Type.URLTEST, outbounds: List<String>,
+        fun urltest(tag: String = Type.URLTEST, outbounds: MutableList<String>,
                     url: String = "https://www.gstatic.com/generate_204", interval: String = "3m",
                     tolerance: Int = 50) = Outbound(
             type = Type.URLTEST,

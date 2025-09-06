@@ -12,7 +12,7 @@ data class SingBox(
     val dns: Dns,
     val inbounds: List<Inbound>,
     val route: Route,
-    val outbounds: List<Outbound>,
+    val outbounds: MutableList<Outbound>,
     val experimental: Exp = Exp(),
     val log: Log = Log()
 ) {

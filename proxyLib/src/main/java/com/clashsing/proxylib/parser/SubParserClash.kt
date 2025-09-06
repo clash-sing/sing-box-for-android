@@ -3,27 +3,161 @@ package com.clashsing.proxylib.parser
 import android.util.Log
 import com.clashsing.proxylib.schema.SingBox
 import com.clashsing.proxylib.schema.clash.Clash
+import com.clashsing.proxylib.schema.clash.Proxy
+import com.clashsing.proxylib.schema.clash.ProxyGroup
 import com.clashsing.proxylib.schema.customJson
 import com.clashsing.proxylib.schema.decodeFromMap
+import com.clashsing.proxylib.schema.singbox.Outbound
 import okhttp3.Headers
 import org.yaml.snakeyaml.Yaml
 
 class SubParserClash(srcContent: String, headers: Headers) : SubParser(srcContent, headers) {
-    override fun getSingBox(): SingBox? {
-        try {
-            val map = Yaml().load<Map<String, *>>(srcContent)
-            val clash =customJson.decodeFromMap<Clash>(map)
-            Log.d("SubParserClash", "parse clash success")
 
+    private var singBox: SingBox? = null
+    private val willRemovedGroup = mutableListOf<ProxyGroup>()
+    companion object {
+        fun convert2SingBoxType(type: String): String {
+            return when (type) {
+                Proxy.Type.HYSTERIA2 -> Outbound.Type.HYSTERIA2
+                Proxy.Type.HYSTERIA -> Outbound.Type.HYSTERIA
+                Proxy.Type.TROJAN -> Outbound.Type.TROJAN
+                Proxy.Type.ANYTLS -> Outbound.Type.ANYTLS
+                ProxyGroup.Type.SELECT -> Outbound.Type.SELECTOR
+                ProxyGroup.Type.URL_TEST -> Outbound.Type.URLTEST
+                else -> throw IllegalArgumentException("unsupported clash proxy type: $type")
+            }
+        }
+    }
+
+    override suspend fun getSingBox(): SingBox? {
+        singBox = getDefaultSingBox()
+        try {
+            val map = Yaml().load<Map<String, Any?>>(srcContent)
+            val clash =customJson.decodeFromMap<Clash>(map)
+            clash.proxies.forEach {
+                singBox?.outbounds?.add(convert2Outbound(it))
+            }
+            clash.proxyGroups.reversed().forEach {
+                val outbound = convert2Outbound(it)
+                if (outbound != null) {
+                    singBox?.outbounds?.add(0, outbound)
+                }
+            }
+            // sing-box 不支持 [Outbound.type] = [ProxyGroup.Type.FALLBACK] 的节点（代理组），需要移除。
+            if (singBox?.outbounds?.isNotEmpty() ?: false) {
+                willRemovedGroup.forEach { proxyGroup ->
+                    singBox?.outbounds?.forEach { outbound ->
+                        if (outbound.outbounds?.isNotEmpty() ?: false) {
+                            if (outbound.outbounds.contains(proxyGroup.name)) {
+                                outbound.outbounds.remove(proxyGroup.name)
+                            }
+                        }
+                    }
+                }
+            }
+
+            Log.d("SubParserClash", "parse clash success")
         } catch (e: Exception) {
             Log.e("SubParserClash", "parse clash failed", e)
         }
 
-        return null
+        return singBox
     }
 
     override fun getSubUserInfo(): String? {
         TODO("Not yet implemented")
     }
+
+    private fun convert2Outbound(proxy: Proxy): Outbound {
+        val type = convert2SingBoxType(proxy.type)
+        return when (type) {
+            Outbound.Type.HYSTERIA2 -> Outbound.hysteria2(
+                tag = proxy.name,
+                server = proxy.server,
+                serverPort = proxy.port.toInt(),
+                serverPorts = listOf((proxy.ports ?: "").replace("-", ":")),
+                upMbps = null,
+                downMbps = null,
+                password = proxy.password!!,
+                tls = Outbound.Tls(
+                    enabled = true,
+                    disableSni = true,
+                    insecure = true,
+                    serverName = "",
+                    alpn = proxy.alpn ?: listOf("h3")
+                )
+            )
+            Outbound.Type.HYSTERIA -> Outbound.hysteria(
+                tag = proxy.name,
+                server = proxy.server,
+                serverPort = proxy.port.toInt(),
+                serverPorts = listOf((proxy.ports ?: "").replace("-", ":")),
+                upMbps = proxy.up?.toInt() ?: 100,
+                downMbps = proxy.down?.toInt() ?: 100,
+                authStr = proxy.authStr!!,
+                disableMtuDiscovery = proxy.disableMtuDiscovery ?: true,
+                tls = Outbound.Tls(
+                    enabled = true,
+                    disableSni = true,
+                    insecure = true,
+                    serverName = "",
+                    alpn = proxy.alpn ?: listOf("h3")
+                )
+            )
+            Outbound.Type.TROJAN -> Outbound.trojan(
+                tag = proxy.name,
+                server = proxy.server,
+                serverPort = proxy.port.toInt(),
+                password = proxy.password!!,
+                tls = Outbound.Tls(
+                    enabled = true,
+                    disableSni = true,
+                    insecure = true,
+                    serverName = ""
+                ),
+                transport = Outbound.Transport(
+                    type = proxy.network ?: Outbound.Transport.WEB_SOCKET
+                )
+            )
+            Outbound.Type.ANYTLS -> Outbound.anyTls(
+                tag = proxy.name,
+                server = proxy.server,
+                serverPort = proxy.port.toInt(),
+                password = proxy.password!!,
+                tls = Outbound.Tls(
+                    enabled = true,
+                    disableSni = false,
+                    insecure = true,
+                    serverName = proxy.sni ?: "",
+                    utls = if (proxy.clientFingerprint.isNullOrBlank()) null else Outbound.Tls.Utls(enabled = true, fingerprint = proxy.clientFingerprint)
+                )
+            )
+            else -> throw IllegalArgumentException("unsupported clash proxy type: ${proxy.type}")
+        }
+    }
+
+    private fun convert2Outbound(group: ProxyGroup): Outbound? {
+        if (group.type == ProxyGroup.Type.FALLBACK) {
+            willRemovedGroup.add(group)
+            return null
+        }
+        val type = convert2SingBoxType(group.type)
+        return when (type) {
+            Outbound.Type.SELECTOR -> Outbound.selector(
+                tag = group.name,
+                outbounds = group.proxies.toMutableList()
+            )
+            Outbound.Type.URLTEST -> Outbound.urltest(
+                tag = group.name,
+                outbounds = group.proxies.toMutableList(),
+                url = group.url ?: "https://www.gstatic.com/generate_204",
+                interval = if (group.interval == null) "3m" else "${group.interval / 60}m",
+                tolerance = 50
+            )
+            else -> throw IllegalArgumentException("unsupported clash proxy type: ${group.type}")
+        }
+    }
+
+
 
 }

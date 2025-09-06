@@ -36,4 +36,11 @@ data class Proxy(
 
     @SerialName("disable_mtu_discovery")
     val disableMtuDiscovery: Boolean? = null
-)
+) {
+    object Type {
+        const val HYSTERIA2 = "hysteria2"
+        const val HYSTERIA = "hysteria"
+        const val ANYTLS = "anytls"
+        const val TROJAN = "trojan"
+    }
+}
