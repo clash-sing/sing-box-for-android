@@ -34,8 +34,9 @@ class SubParserRocket(srcContent: String, headers: Headers) : SubParser(srcConte
         }
         if (outbounds.isNotEmpty()) {
             this._singBox = getDefaultSingBox()
-            this._singBox?.let {
-                it.outbounds.add(Outbound.selector(outbounds = outbounds.map { outbound -> outbound.tag }.toMutableList()))
+            this.singBox?.let {
+                it.outbounds.add(0, Outbound.urltest(outbounds = outbounds.map { outbound -> outbound.tag }.toMutableList()))
+                it.outbounds.add(0, Outbound.selector(outbounds = outbounds.map { outbound -> outbound.tag }.toMutableList()))
                 it.outbounds.addAll(outbounds)
             }
         }
