@@ -15,9 +15,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.clashsing.proxylib.SubUserinfoManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import io.nekohasekai.sfa.R
-import io.nekohasekai.sfa.cs.SubscriptionUserinfoManager
 import io.nekohasekai.sfa.database.Profile
 import io.nekohasekai.sfa.database.ProfileManager
 import io.nekohasekai.sfa.database.TypedProfile
@@ -219,7 +219,7 @@ class ConfigurationFragment : Fragment() {
                     R.string.profile_item_last_updated,
                     DateFormat.getDateTimeInstance().format(profile.typed.lastUpdated)
                 )
-                SubscriptionUserinfoManager.getUserinfo(profile.id)?.let { userinfo ->
+                SubUserinfoManager.getUserinfo(profile.id)?.let { userinfo ->
                     if (userinfo.usedBytes != null || userinfo.totalBytes != null || userinfo.expireTimestamp != null || userinfo.spUrl.isNotBlank()) {
                         binding.profileUserinfo.isVisible = true
                         if (userinfo.usedBytes != null || userinfo.totalBytes != null) {

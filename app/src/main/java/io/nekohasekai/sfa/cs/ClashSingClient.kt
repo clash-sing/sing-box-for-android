@@ -1,16 +1,12 @@
 package io.nekohasekai.sfa.cs
 
-import android.util.Log
 import android.webkit.WebSettings
 import androidx.annotation.WorkerThread
+import com.clashsing.proxylib.SubUserinfoManager
 import com.clashsing.proxylib.parser.SubParser
 import com.clashsing.proxylib.parser.SubParserClash
-import com.clashsing.proxylib.schema.SingBox
 import com.clashsing.proxylib.schema.customJson
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import io.nekohasekai.sfa.Application
-import io.nekohasekai.sfa.cs.parser.DefaultSubscriptionParserImpl
 import io.nekohasekai.sfa.utils.HTTPClient
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -19,7 +15,6 @@ import okio.GzipSource
 import okio.buffer
 import org.yaml.snakeyaml.Yaml
 import java.io.Closeable
-import java.lang.reflect.Type
 import java.util.concurrent.TimeUnit
 import kotlin.io.use
 
@@ -55,7 +50,10 @@ class ClashSingClient(val profileId: Long) : Closeable {
             }
             val singBox = subParser?.getSingBox()
             return if (singBox != null) {
-//                subParser.getSubUserInfo()
+                val subUserinfo = subParser.getSubUserInfo()
+                subUserinfo?.let {
+                    SubUserinfoManager.setUserinfo(profileId, it)
+                }
                 customJson.encodeToString(singBox)
             } else {
                 singBoxContent
