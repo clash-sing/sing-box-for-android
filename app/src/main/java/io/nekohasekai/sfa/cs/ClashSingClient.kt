@@ -38,21 +38,6 @@ class ClashSingClient(val profileId: Long) : Closeable {
     @WorkerThread
     suspend fun getString(url: String): String {
         val singBoxContent = HTTPClient().use { it.getString(url) }
-//        try {
-//            val singBox = customJson.decodeFromString<SingBox>(singBoxContent)
-//            Log.d("ClashSingClient", "singBox: $singBox")
-//            val newSingBoxString =customJson.encodeToString(singBox)
-//            Log.d("ClashSingClient", "newSingBoxString: $newSingBoxString")
-//        } catch (e: Exception) {
-//            Log.e("ClashSingClient", "",e)
-//        }
-
-//        val singBoxMap = try {
-//            val type: Type = object : TypeToken<Map<String, Any?>>(){}.type
-//            Gson().fromJson(singBoxContent, type)
-//        } catch (e: Exception) {
-//            emptyMap<String, Any?>()
-//        }
         var subParser: SubParser? = null
         val resultWrapper = runCatching {
             getClashSingString(url)
@@ -75,11 +60,6 @@ class ClashSingClient(val profileId: Long) : Closeable {
             } else {
                 singBoxContent
             }
-
-//            val mapClashSing = Yaml().load<Map<String, Any?>>(resultWrapper.getOrNull()?.content)
-//            val parser = DefaultSubscriptionParserImpl(singBoxMap, mapClashSing)
-//            parser.setSubscriptionUserinfo(profileId, resultWrapper.getOrNull()!!)
-//            val newContent = parser.getFixedContent()
         } else {
             return singBoxContent
         }
