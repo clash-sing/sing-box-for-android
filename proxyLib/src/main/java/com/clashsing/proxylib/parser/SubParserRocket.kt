@@ -117,6 +117,7 @@ class SubParserRocket(srcContent: String, headers: Headers) : SubParser(srcConte
 
     override fun getSubUserInfo(): SubUserinfo? {
         // STATUS=🚀↑:0.58GB,↓:4.31GB,TOT:200GB💡Expires:2026-04-30
+        // STATUS%3D%F0%9F%9A%80%E2%86%91%3A0.58GB%2C%E2%86%93%3A4.31GB%2CTOT%3A200GB%F0%9F%92%A1Expires%3A2026-04-30
         if (statusLine == null) {
             statusLine = decodeContent?.lineSequence()?.firstOrNull { line ->
                 line.uppercase().startsWith("STATUS")
@@ -124,14 +125,14 @@ class SubParserRocket(srcContent: String, headers: Headers) : SubParser(srcConte
         }
         var subUserinfo: SubUserinfo? = null
         if (!statusLine.isNullOrBlank()) {
+            val encodeStatus = Uri.encode(statusLine!!)
+            val expiresTag = "Expires%3A"
             var used: Long? = null
             var total: Long? = null
             var expireTimestamp: Long? = null
-            val pattern = """;([^&]+)&""".toRegex()
-            val match = pattern.find(statusLine!!)
-            val usedAndTotal = match?.groupValues?.get(1)
-            if (!usedAndTotal.isNullOrBlank()) {
-                val usedAndTotalArray =usedAndTotal.split(",")
+            val usedAndTotal = encodeStatus.substring(0, encodeStatus.indexOf(expiresTag)-12)
+            if (usedAndTotal.isNotEmpty()) {
+                val usedAndTotalArray =usedAndTotal.split("%2C")
                 if (usedAndTotalArray.size == 3) {
                     val upload = usedString2Long(usedAndTotalArray[0])
                     val download = usedString2Long(usedAndTotalArray[1])
@@ -141,14 +142,13 @@ class SubParserRocket(srcContent: String, headers: Headers) : SubParser(srcConte
                     total = usedString2Long(usedAndTotalArray[2])
                 }
             }
-            val expiresTag = "Expires:"
-            if (statusLine!!.contains(expiresTag)) {
-                val strExpires = statusLine!!.substring(statusLine!!.indexOf(expiresTag) + expiresTag.length)
-                val formatter = DateTimeFormatter.ISO_LOCAL_DATE // "yyyy-MM-dd"
+            if (encodeStatus.contains(expiresTag)) {
+                val strExpires = encodeStatus!!.split(expiresTag)[1]
+                val formatter = DateTimeFormatter.ISO_LOCAL_DATE // yyyy-MM-dd
                 try {
                     val localDate = LocalDate.parse(strExpires, formatter)
-                    val zonedDateTime = localDate.atStartOfDay(ZoneId.systemDefault()) // 使用指定时区的 00:00:00
-                    expireTimestamp = zonedDateTime.toInstant().toEpochMilli() // 毫秒级时间戳
+                    val zonedDateTime = localDate.atStartOfDay(ZoneId.systemDefault())
+                    expireTimestamp = zonedDateTime.toInstant().toEpochMilli()
                 } catch (e: Exception) {
                     Log.e("SubParserRocket", "parse expires error: $e")
                 }
@@ -167,8 +167,8 @@ class SubParserRocket(srcContent: String, headers: Headers) : SubParser(srcConte
     }
 
     private fun usedString2Long(str: String): Long? {
-        if (str.contains(":")) {
-            val strValue = str.substring(str.indexOf(":") + 1)
+        if (str.contains("%3A")) {
+            val strValue = str.substring(str.indexOf("%3A") + 3)
             if (strValue.uppercase().contains("GB")) {
                 return (strValue.substring(0, strValue.indexOf("GB")).toFloat() * 1024 * 1024 * 1024).toLong()
             } else if (strValue.uppercase().contains("MB")) {
