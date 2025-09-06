@@ -7,6 +7,10 @@ import com.clashsing.proxylib.schema.customJson
 import okhttp3.Headers
 
 abstract class SubParser(val srcContent: String, val headers: Headers) {
+    protected var _singBox: SingBox? = null
+    val singBox: SingBox?
+        get() = _singBox
+
     abstract suspend fun getSingBox(): SingBox?
     abstract fun getSubUserInfo(): SubUserinfo?
 

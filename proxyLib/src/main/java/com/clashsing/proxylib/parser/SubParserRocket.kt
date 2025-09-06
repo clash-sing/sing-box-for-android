@@ -1,0 +1,189 @@
+package com.clashsing.proxylib.parser
+
+import android.net.Uri
+import android.util.Log
+import com.clashsing.proxylib.SubUserinfo
+import com.clashsing.proxylib.schema.SingBox
+import okhttp3.Headers
+import kotlin.io.encoding.Base64
+import androidx.core.net.toUri
+import com.clashsing.proxylib.schema.singbox.Outbound
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+
+class SubParserRocket(srcContent: String, headers: Headers) : SubParser(srcContent, headers) {
+    private var decodeContent: String? = null
+    private var statusLine: String? = null
+    private val outbounds: MutableList<Outbound> = mutableListOf()
+
+    override suspend fun getSingBox(): SingBox? {
+        val byteArray = Base64.decode(srcContent)
+        decodeContent = String(byteArray, Charsets.UTF_8)
+        decodeContent?.lineSequence()?.forEach { line ->
+            if (line.uppercase().startsWith("STATUS")) {
+                statusLine = line
+            } else {
+                val uri = line.toUri()
+                val outbound = parseUri(uri)
+                if (outbound != null) {
+                    outbounds.add(outbound)
+                }
+            }
+            Log.d("Rocket", line)
+        }
+        if (outbounds.isNotEmpty()) {
+            this._singBox = getDefaultSingBox()
+            this._singBox?.let {
+                it.outbounds.add(Outbound.selector(outbounds = outbounds.map { outbound -> outbound.tag }.toMutableList()))
+                it.outbounds.addAll(outbounds)
+            }
+        }
+        return this.singBox
+    }
+
+    private fun parseUri(uri: Uri): Outbound? {
+        return when (uri.scheme) {
+            Schema.HYSTERIA2 -> {
+                Outbound.hysteria2(
+                    tag = uri.fragment ?: return null,
+                    server = uri.host ?: return null,
+                    serverPort = uri.port.toLong(),
+                    password = uri.userInfo ?: return null,
+                    serverPorts = listOf(uri.getQueryParameter("mport")?.replace("-", ":") ?: return null),
+                    tls = Outbound.Tls(
+                        enabled = true,
+                        disableSni = true,
+                        serverName = "",
+                        insecure = true
+                    )
+                )
+            }
+            Schema.HYSTERIA -> {
+                Outbound.hysteria(
+                    tag = uri.fragment ?: return null,
+                    server = uri.host ?: return null,
+                    serverPort = uri.port.toLong(),
+                    authStr = uri.getQueryParameter("auth") ?: return null,
+                    serverPorts = listOf(uri.getQueryParameter("mport")?.replace("-", ":") ?: return null),
+                    upMbps = uri.getQueryParameter("upmbps")?.toLong() ?: 100,
+                    downMbps = uri.getQueryParameter("downmbps")?.toLong() ?: 100,
+                    disableMtuDiscovery = true,
+                    tls = Outbound.Tls(
+                        enabled = true,
+                        disableSni = true,
+                        serverName = "",
+                        insecure = true,
+                        alpn = if (uri.getQueryParameter("alpn").isNullOrBlank()) null
+                        else listOf(uri.getQueryParameter("alpn")!!),
+                    )
+                )
+            }
+            Schema.TROJAN -> {
+                Outbound.trojan(
+                    tag = uri.fragment ?: return null,
+                    server = uri.host ?: return null,
+                    serverPort = uri.port.toLong(),
+                    password = uri.userInfo ?: return null,
+                    tls = Outbound.Tls(
+                        enabled = true,
+                        disableSni = true,
+                        serverName = "",
+                        insecure = true
+                    ),
+                    transport = Outbound.Transport(type = Outbound.Transport.WEB_SOCKET)
+                )
+            }
+            Schema.ANYTLS -> {
+                Outbound.anyTls(
+                    tag = uri.fragment ?: return null,
+                    server = uri.host ?: return null,
+                    serverPort = uri.port.toLong(),
+                    password = uri.userInfo ?: return null,
+                    tls = Outbound.Tls(
+                        enabled = true,
+                        disableSni = uri.getQueryParameter("peer").isNullOrBlank(),
+                        serverName = uri.getQueryParameter("peer") ?: "",
+                        insecure = true
+                    )
+                )
+            }
+            else -> {
+                Log.w("ShadowRocket", "Unsupported schema: ${uri.scheme}")
+                return null
+            }
+        }
+    }
+
+    override fun getSubUserInfo(): SubUserinfo? {
+        // STATUS=🚀↑:0.58GB,↓:4.31GB,TOT:200GB💡Expires:2026-04-30
+        if (statusLine == null) {
+            statusLine = decodeContent?.lineSequence()?.firstOrNull { line ->
+                line.uppercase().startsWith("STATUS")
+            }
+        }
+        var subUserinfo: SubUserinfo? = null
+        if (!statusLine.isNullOrBlank()) {
+            var used: Long? = null
+            var total: Long? = null
+            var expireTimestamp: Long? = null
+            val pattern = """;([^&]+)&""".toRegex()
+            val match = pattern.find(statusLine!!)
+            val usedAndTotal = match?.groupValues?.get(1)
+            if (!usedAndTotal.isNullOrBlank()) {
+                val usedAndTotalArray =usedAndTotal.split(",")
+                if (usedAndTotalArray.size == 3) {
+                    val upload = usedString2Long(usedAndTotalArray[0])
+                    val download = usedString2Long(usedAndTotalArray[1])
+                    if (upload != null || download != null) {
+                        used = (upload ?: 0) + (download ?: 0)
+                    }
+                    total = usedString2Long(usedAndTotalArray[2])
+                }
+            }
+            val expiresTag = "Expires:"
+            if (statusLine!!.contains(expiresTag)) {
+                val strExpires = statusLine!!.substring(statusLine!!.indexOf(expiresTag) + expiresTag.length)
+                val formatter = DateTimeFormatter.ISO_LOCAL_DATE // "yyyy-MM-dd"
+                try {
+                    val localDate = LocalDate.parse(strExpires, formatter)
+                    val zonedDateTime = localDate.atStartOfDay(ZoneId.systemDefault()) // 使用指定时区的 00:00:00
+                    expireTimestamp = zonedDateTime.toInstant().toEpochMilli() // 毫秒级时间戳
+                } catch (e: Exception) {
+                    Log.e("SubParserRocket", "parse expires error: $e")
+                }
+            }
+            if (used != null || total != null || expireTimestamp != null) {
+                subUserinfo = SubUserinfo(
+                    usedBytes = used,
+                    totalBytes = total,
+                    expireTimestamp = expireTimestamp,
+                    spUrl = null,
+                    spDisposition = null
+                )
+            }
+        }
+        return subUserinfo
+    }
+
+    private fun usedString2Long(str: String): Long? {
+        if (str.contains(":")) {
+            val strValue = str.substring(str.indexOf(":") + 1)
+            if (strValue.uppercase().contains("GB")) {
+                return (strValue.substring(0, strValue.indexOf("GB")).toFloat() * 1024 * 1024 * 1024).toLong()
+            } else if (strValue.uppercase().contains("MB")) {
+                return (strValue.substring(0, strValue.indexOf("MB")).toFloat() * 1024 * 1024).toLong()
+            } else if (strValue.uppercase().contains("KB")) {
+                return (strValue.substring(0, strValue.indexOf("KB")).toFloat() * 1024).toLong()
+            }
+        }
+        return null
+    }
+
+    object Schema {
+        const val TROJAN = "trojan"
+        const val HYSTERIA = "hysteria"
+        const val HYSTERIA2 = "hysteria2"
+        const val ANYTLS = "anytls"
+    }
+}

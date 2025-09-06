@@ -5,6 +5,7 @@ import androidx.annotation.WorkerThread
 import com.clashsing.proxylib.SubUserinfoManager
 import com.clashsing.proxylib.parser.SubParser
 import com.clashsing.proxylib.parser.SubParserClash
+import com.clashsing.proxylib.parser.SubParserRocket
 import com.clashsing.proxylib.schema.customJson
 import io.nekohasekai.sfa.Application
 import okhttp3.Headers
@@ -34,22 +35,26 @@ class ClashSingClient(val profileId: Long) : Closeable {
     suspend fun getString(url: String): String {
         val singBoxContent = HTTPClient().use { it.getString(url) }
         var subParser: SubParser? = null
-        val resultWrapper = runCatching {
+        val resultClashSing = runCatching {
             getClashSingString(url)
         }
-        if (resultWrapper.isSuccess) {
-            val resultYaml = runCatching {
-                val content = resultWrapper.getOrNull()?.content ?: throw Exception("Response body is null.")
-                Yaml().load<Map<String, Any?>>(content)
-                content
+        if (resultClashSing.isSuccess) {
+            val clashSingContent = resultClashSing.getOrNull()?.content ?: throw Exception("Response body is null.")
+            val resultYaml: Result<Map<String, Any?>> = runCatching {
+                Yaml().load(clashSingContent)
             }
             if (resultYaml.isSuccess) {
                 subParser = SubParserClash(
-                    resultWrapper.getOrNull()!!.content,
-                    resultWrapper.getOrNull()!!.headers
+                    resultClashSing.getOrNull()!!.content,
+                    resultClashSing.getOrNull()!!.headers
                 )
             } else {
-
+                if (clashSingContent.endsWith("=")) {
+                    subParser = SubParserRocket(
+                        clashSingContent,
+                        resultClashSing.getOrNull()!!.headers
+                    )
+                }
             }
             val singBox = subParser?.getSingBox()
             return if (singBox != null) {

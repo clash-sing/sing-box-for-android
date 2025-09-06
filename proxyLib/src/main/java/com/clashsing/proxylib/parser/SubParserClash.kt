@@ -15,7 +15,6 @@ import kotlin.text.split
 
 class SubParserClash(srcContent: String, headers: Headers) : SubParser(srcContent, headers) {
 
-    private var singBox: SingBox? = null
     private val willRemovedGroup = mutableListOf<ProxyGroup>()
     companion object {
         /**
@@ -49,23 +48,23 @@ class SubParserClash(srcContent: String, headers: Headers) : SubParser(srcConten
     }
 
     override suspend fun getSingBox(): SingBox? {
-        singBox = getDefaultSingBox()
+        this._singBox = getDefaultSingBox()
         try {
             val map = Yaml().load<Map<String, Any?>>(srcContent)
             val clash =customJson.decodeFromMap<Clash>(map)
             clash.proxies.forEach {
-                singBox?.outbounds?.add(convert2Outbound(it))
+                this.singBox?.outbounds?.add(convert2Outbound(it))
             }
             clash.proxyGroups.reversed().forEach {
                 val outbound = convert2Outbound(it)
                 if (outbound != null) {
-                    singBox?.outbounds?.add(0, outbound)
+                    this.singBox?.outbounds?.add(0, outbound)
                 }
             }
             // sing-box 不支持 [Outbound.type] = [ProxyGroup.Type.FALLBACK] 的节点（代理组），需要移除。
             if (singBox?.outbounds?.isNotEmpty() ?: false) {
                 willRemovedGroup.forEach { proxyGroup ->
-                    singBox?.outbounds?.forEach { outbound ->
+                    this.singBox?.outbounds?.forEach { outbound ->
                         if (outbound.outbounds?.isNotEmpty() ?: false) {
                             if (outbound.outbounds.contains(proxyGroup.name)) {
                                 outbound.outbounds.remove(proxyGroup.name)
@@ -80,7 +79,7 @@ class SubParserClash(srcContent: String, headers: Headers) : SubParser(srcConten
             Log.e("SubParserClash", "parse clash failed", e)
         }
 
-        return singBox
+        return this.singBox
     }
 
     private fun convert2Outbound(proxy: Proxy): Outbound {
@@ -141,7 +140,7 @@ class SubParserClash(srcContent: String, headers: Headers) : SubParser(srcConten
                 password = proxy.password!!,
                 tls = Outbound.Tls(
                     enabled = true,
-                    disableSni = false,
+                    disableSni = proxy.sni.isNullOrBlank(),
                     insecure = true,
                     serverName = proxy.sni ?: "",
                     utls = if (proxy.clientFingerprint.isNullOrBlank()) null else Outbound.Tls.Utls(enabled = true, fingerprint = proxy.clientFingerprint)
