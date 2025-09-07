@@ -16,13 +16,12 @@ import okio.Buffer
 import okio.BufferedSource
 import okio.GzipSource
 import okio.buffer
-import org.yaml.snakeyaml.Yaml
 import java.io.Closeable
 import java.util.concurrent.TimeUnit
 
 class ClashSingClient(val profileId: Long) : Closeable {
     companion object {
-        const val USER_AGENT = "clashmeta/v1.19.12"
+        const val USER_AGENT = "SFA/1.12.4 mihomo/1.19.12 ClashMeta clash-verge v2ray"
         const val ACCEPT = "application/json, application/yaml;q=0.8, text/plain;q=0.5"
         const val ACCEPT_ENCODING = "gzip"
     }
@@ -34,42 +33,44 @@ class ClashSingClient(val profileId: Long) : Closeable {
 
     @WorkerThread
     suspend fun getString(url: String): String {
-        val singBoxContent = HTTPClient().use { it.getString(url) }
-        var subParser: SubParser? = null
         val resultClashSing = runCatching {
-            getClashSingString(url)
-        }
-        if (resultClashSing.isSuccess) {
-            val clashSingContent = resultClashSing.getOrNull()?.content ?: throw Exception("Response body is null.")
-            val headers = resultClashSing.getOrNull()?.headers ?: throw Exception("Response headers is null.")
-            val firstLine = clashSingContent.lineSequence().first()
+            var subParser: SubParser? = null
+            val wrapper = getClashSingString(url)
+            val srcContent = wrapper.content
+            val firstLine = srcContent.lineSequence().first()
+            val headers = wrapper.headers
             if (firstLine.startsWith("{")) { // Json
-                return singBoxContent
+                return srcContent
             } else if (firstLine.contains(":")) { // Yaml
                 try {
-                    subParser = SubParserClash(clashSingContent, headers)
+                    subParser = SubParserClash(srcContent, headers)
                 } catch (e: Exception) {
                     Log.e("ClashSingClient", "Yaml decode failed.", e)
                 }
             } else { // Base64
                 try {
-                    subParser = SubParserRocket(clashSingContent, headers)
+                    subParser = SubParserRocket(srcContent, headers)
                 } catch (e: Exception) {
                     Log.e("ClashSingClient", "Base64 decode failed.", e)
                 }
             }
             val singBox = subParser?.getSingBox()
-            return if (singBox != null) {
+            val clashSingContent = if (singBox != null) {
                 val subUserinfo = subParser.getSubUserInfo()
                 subUserinfo?.let {
                     SubUserinfoManager.setUserinfo(profileId, it)
                 }
                 customJson.encodeToString(singBox)
             } else {
-                singBoxContent
+                throw Exception("Unsupported format.")
             }
+            clashSingContent
+        }
+        if (resultClashSing.isSuccess) {
+            return resultClashSing.getOrNull() ?: throw Exception("Response body is null.")
         } else {
-            return singBoxContent
+            val content = HTTPClient().use { it.getString(url) }
+            return content
         }
     }
 
