@@ -27,8 +27,8 @@ class ClashSingClient(val profileId: Long) : Closeable {
     }
 
     private val client = OkHttpClient.Builder()
-        .connectTimeout(10, TimeUnit.SECONDS)
-        .readTimeout(10, TimeUnit.SECONDS)
+//        .connectTimeout(10, TimeUnit.SECONDS)
+//        .readTimeout(10, TimeUnit.SECONDS)
         .build()
 
     @WorkerThread
