@@ -183,23 +183,9 @@ class NewProfileActivity : AbstractActivity<ActivityAddProfileBinding>() {
             TypedProfile.Type.Remote.getString(this) -> {
                 typedProfile.type = TypedProfile.Type.Remote
                 val remoteURL = binding.remoteURL.text
-                val content = ClashSingClient(fileID).use { it.getString(remoteURL) }
 //                val content = HTTPClient().use { it.getString(remoteURL) }
+                val content = ClashSingClient(fileID).use { it.getString(remoteURL) }
                 Libbox.checkConfig(content)
-/*
-                val clashResult = ClashSingClient().use { it.getString(remoteURL) }
-                clashResult.onSuccess { clashData ->
-                    clashData.subscriptionUserinfo?.let {
-                        SubscriptionUserinfoManager.setUserinfo(fileID, it)
-                    }
-                    val clash2SingBox = Clash2SingBox(clashData, content)
-                    content = clash2SingBox.getFixedSingBox().toString()
-                }.onFailure {
-                    Log.e("NewProfileActivity", "clash error", it)
-                }
-*/
-
-
                 configFile.writeText(content)
                 typedProfile.remoteURL = remoteURL
                 typedProfile.lastUpdated = Date()
