@@ -7,6 +7,8 @@ import com.clashsing.proxylib.schema.SingBox
 import okhttp3.Headers
 import kotlin.io.encoding.Base64
 import androidx.core.net.toUri
+import com.clashsing.proxylib.ProxyComponent
+import com.clashsing.proxylib.R
 import com.clashsing.proxylib.schema.singbox.Outbound
 import java.time.LocalDate
 import java.time.ZoneId
@@ -35,8 +37,12 @@ class SubParserRocket(srcContent: String, headers: Headers) : SubParser(srcConte
         if (outbounds.isNotEmpty()) {
             this._singBox = getDefaultSingBox()
             this.singBox?.let {
-                it.outbounds.add(0, Outbound.urltest(outbounds = outbounds.map { outbound -> outbound.tag }.toMutableList()))
-                it.outbounds.add(0, Outbound.selector(outbounds = outbounds.map { outbound -> outbound.tag }.toMutableList()))
+                val urlTestTag = ProxyComponent.application.getString(R.string.proxy_lib_url_test_default_tag)
+                val urlTestOutbound = Outbound.urltest(tag = urlTestTag, outbounds = outbounds.map { outbound -> outbound.tag }.toMutableList())
+                outbounds.add(0, urlTestOutbound)
+                val selectorOutbound = Outbound.selector(outbounds = outbounds.map { outbound -> outbound.tag }.toMutableList())
+                selectorOutbound.outbounds?.add(0, urlTestOutbound.tag)
+                outbounds.add(0, selectorOutbound)
                 it.outbounds.addAll(outbounds)
             }
         }

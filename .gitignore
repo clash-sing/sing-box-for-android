@@ -12,3 +12,4 @@ local.properties
 /service-account-credentials.json
 /*.keystore
 /*.jks
+/GEMINI.md
