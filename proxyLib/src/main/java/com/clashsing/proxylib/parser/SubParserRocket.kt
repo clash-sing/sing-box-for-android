@@ -37,13 +37,15 @@ class SubParserRocket(srcContent: String, headers: Headers) : SubParser(srcConte
         if (outbounds.isNotEmpty()) {
             this._singBox = getDefaultSingBox()
             this.singBox?.let {
+                it.outbounds.addAll(outbounds)
+
                 val urlTestTag = ProxyComponent.application.getString(R.string.proxy_lib_url_test_default_tag)
                 val urlTestOutbound = Outbound.urltest(tag = urlTestTag, outbounds = outbounds.map { outbound -> outbound.tag }.toMutableList())
-                outbounds.add(0, urlTestOutbound)
+                it.outbounds.add(0, urlTestOutbound)
+
                 val selectorOutbound = Outbound.selector(outbounds = outbounds.map { outbound -> outbound.tag }.toMutableList())
-                selectorOutbound.outbounds?.add(0, urlTestOutbound.tag)
-                outbounds.add(0, selectorOutbound)
-                it.outbounds.addAll(outbounds)
+                selectorOutbound.outbounds?.add(0, urlTestTag)
+                it.outbounds.add(0, selectorOutbound)
             }
         }
         return this.singBox
