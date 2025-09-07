@@ -59,7 +59,13 @@ data class Outbound(
     val disableMtuDiscovery: Boolean? = null,
 
     val tls: Tls? = null,
-    val transport: Transport? = null
+    val transport: Transport? = null,
+
+    val network: String? = null,
+
+    /** shadowsocks 加密方法 */
+    @Deprecated("仅用于 shadowsocks")
+    val method: String? = null,
 
 ) {
     companion object {
@@ -135,6 +141,15 @@ data class Outbound(
             serverPort = serverPort,
             password = password,
             tls = tls
+        )
+        fun shadowsocks(tag: String, server: String, serverPort: Long, method: String, password: String, network: String) = Outbound(
+            type = Type.SHADOWSOCKS,
+            tag = tag,
+            server = server,
+            serverPort = serverPort,
+            method = method,
+            password = password,
+            network = network
         )
     }
     object Type {

@@ -13,7 +13,7 @@ data class Proxy(
     val password: String? = null,
 
     @SerialName("skip-cert-verify")
-    val skipCertVerify: Boolean,
+    val skipCertVerify: Boolean = true,
 
     @SerialName("client-fingerprint")
     val clientFingerprint: String? = null,
@@ -35,12 +35,17 @@ data class Proxy(
     val fastOpen: Boolean? = null,
 
     @SerialName("disable_mtu_discovery")
-    val disableMtuDiscovery: Boolean? = null
+    val disableMtuDiscovery: Boolean? = null,
+
+    /** shadowsocks 加密方法 */
+    @Deprecated("仅对 shadowsocks 协议有效")
+    val cipher: String? = null
 ) {
     object Type {
         const val HYSTERIA2 = "hysteria2"
         const val HYSTERIA = "hysteria"
         const val ANYTLS = "anytls"
         const val TROJAN = "trojan"
+        const val SHADOWSOCKS = "ss"
     }
 }

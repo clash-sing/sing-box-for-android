@@ -40,6 +40,7 @@ class SubParserClash(srcContent: String, headers: Headers) : SubParser(srcConten
                 Proxy.Type.HYSTERIA -> Outbound.Type.HYSTERIA
                 Proxy.Type.TROJAN -> Outbound.Type.TROJAN
                 Proxy.Type.ANYTLS -> Outbound.Type.ANYTLS
+                Proxy.Type.SHADOWSOCKS -> Outbound.Type.SHADOWSOCKS
                 ProxyGroup.Type.SELECT -> Outbound.Type.SELECTOR
                 ProxyGroup.Type.URL_TEST -> Outbound.Type.URLTEST
                 else -> throw IllegalArgumentException("unsupported clash proxy type: $type")
@@ -49,36 +50,29 @@ class SubParserClash(srcContent: String, headers: Headers) : SubParser(srcConten
 
     override suspend fun getSingBox(): SingBox? {
         this._singBox = getDefaultSingBox()
-        try {
-            val map = Yaml().load<Map<String, Any?>>(srcContent)
-            val clash =customJson.decodeFromMap<Clash>(map)
-            clash.proxies.forEach {
-                this.singBox?.outbounds?.add(convert2Outbound(it))
+        val map = Yaml().load<Map<String, Any?>>(srcContent)
+        val clash =customJson.decodeFromMap<Clash>(map)
+        clash.proxies.forEach {
+            this.singBox?.outbounds?.add(convert2Outbound(it))
+        }
+        clash.proxyGroups.reversed().forEach {
+            val outbound = convert2Outbound(it)
+            if (outbound != null) {
+                this.singBox?.outbounds?.add(0, outbound)
             }
-            clash.proxyGroups.reversed().forEach {
-                val outbound = convert2Outbound(it)
-                if (outbound != null) {
-                    this.singBox?.outbounds?.add(0, outbound)
-                }
-            }
-            // sing-box 不支持 [Outbound.type] = [ProxyGroup.Type.FALLBACK] 的节点（代理组），需要移除。
-            if (singBox?.outbounds?.isNotEmpty() ?: false) {
-                willRemovedGroup.forEach { proxyGroup ->
-                    this.singBox?.outbounds?.forEach { outbound ->
-                        if (outbound.outbounds?.isNotEmpty() ?: false) {
-                            if (outbound.outbounds.contains(proxyGroup.name)) {
-                                outbound.outbounds.remove(proxyGroup.name)
-                            }
+        }
+        // sing-box 不支持 [Outbound.type] = [ProxyGroup.Type.FALLBACK] 的节点（代理组），需要移除。
+        if (singBox?.outbounds?.isNotEmpty() ?: false) {
+            willRemovedGroup.forEach { proxyGroup ->
+                this.singBox?.outbounds?.forEach { outbound ->
+                    if (outbound.outbounds?.isNotEmpty() ?: false) {
+                        if (outbound.outbounds.contains(proxyGroup.name)) {
+                            outbound.outbounds.remove(proxyGroup.name)
                         }
                     }
                 }
             }
-
-            Log.d("SubParserClash", "parse clash success")
-        } catch (e: Exception) {
-            Log.e("SubParserClash", "parse clash failed", e)
         }
-
         return this.singBox
     }
 
@@ -145,6 +139,14 @@ class SubParserClash(srcContent: String, headers: Headers) : SubParser(srcConten
                     serverName = proxy.sni ?: "",
                     utls = if (proxy.clientFingerprint.isNullOrBlank()) null else Outbound.Tls.Utls(enabled = true, fingerprint = proxy.clientFingerprint)
                 )
+            )
+            Outbound.Type.SHADOWSOCKS -> Outbound.shadowsocks(
+                tag = proxy.name,
+                server = proxy.server,
+                serverPort = proxy.port,
+                password = proxy.password!!,
+                method = proxy.cipher ?: "",
+                network = if (proxy.udp ?: false) "udp" else "tcp"
             )
             else -> throw IllegalArgumentException("unsupported clash proxy type: ${proxy.type}")
         }
