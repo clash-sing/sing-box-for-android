@@ -8,13 +8,17 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class RouteRule(
     /** @see [Action] */
-    val action: String = Action.ROUTE,
+    var action: String = Action.ROUTE,
 
     /** @see [ClashMode] */
     @SerialName("clash_mode")
     val clashMode: String? = null,
 
-    /** @see [Outbound.tag] */
+    /**
+     * 出站标签 [Outbound.tag]
+     * Deprecated, @see [action]
+     */
+    @Deprecated("已在 sing-box 1.11.0 废弃")
     val outbound: String? = null,
 
     /** @see [RouteRuleSet.tag] */

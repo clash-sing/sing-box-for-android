@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class DnsServer(
     /** @see: [Type] */
-    val type: String,
+    val type: String? = null,
 
     /** @see: [Tag] */
     val tag: String,
@@ -21,6 +21,9 @@ data class DnsServer(
     /** @see: [InetRange] */
     @SerialName("inet6_range")
     val inet6Range: String? = null,
+
+    val address: String? = null,
+    val detour: String? = null,
 ) {
     companion object {
         const val ALI_DNS = "223.5.5.5"

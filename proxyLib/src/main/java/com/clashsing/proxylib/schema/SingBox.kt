@@ -13,7 +13,7 @@ data class SingBox(
     val inbounds: List<Inbound>,
     val route: Route,
     val outbounds: MutableList<Outbound>,
-    val experimental: Exp = Exp(),
+    val experimental: Experimental = Experimental(),
     val log: Log = Log()
 ) {
 
@@ -37,7 +37,7 @@ data class SingBox(
     }
 
     @Serializable
-    data class Exp(
+    data class Experimental(
         @SerialName("cache_file")
         val cacheFile: CacheFile = CacheFile(),
     ) {
@@ -46,7 +46,10 @@ data class SingBox(
         data class CacheFile(
             val enabled: Boolean = true,
             @SerialName("store_fakeip")
-            val storeFakeip: Boolean = true
+            val storeFakeip: Boolean = true,
+            val path: String? = null,
+            @SerialName("cache_id")
+            val cacheId: String? = null
         )
 
     }

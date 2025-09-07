@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 data class DnsRule(
 
     /** @see [RouteRule.Action] */
-    val action: String = RouteRule.Action.ROUTE,
+    var action: String = RouteRule.Action.ROUTE,
 
     /**
      * @see [DnsServer.Tag]
@@ -23,6 +23,9 @@ data class DnsRule(
 
     @SerialName("query_type")
     val queryType: List<String>? = null,
+
+    val outbound: List<String>? = null,
+
 
     ) {
     companion object {

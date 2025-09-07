@@ -1,6 +1,6 @@
 package com.clashsing.proxylib.parser
 
-import android.util.Log
+import android.net.Uri
 import com.clashsing.proxylib.SubUserinfo
 import com.clashsing.proxylib.schema.SingBox
 import com.clashsing.proxylib.schema.clash.Clash
@@ -13,7 +13,7 @@ import okhttp3.Headers
 import org.yaml.snakeyaml.Yaml
 import kotlin.text.split
 
-class SubParserClash(srcContent: String, headers: Headers) : SubParser(srcContent, headers) {
+class SubParserClash(originSingBox: SingBox?, srcContent: String, headers: Headers) : SubParser(originSingBox, srcContent, headers) {
 
     private val willRemovedGroup = mutableListOf<ProxyGroup>()
     companion object {
@@ -41,6 +41,7 @@ class SubParserClash(srcContent: String, headers: Headers) : SubParser(srcConten
                 Proxy.Type.TROJAN -> Outbound.Type.TROJAN
                 Proxy.Type.ANYTLS -> Outbound.Type.ANYTLS
                 Proxy.Type.SHADOWSOCKS -> Outbound.Type.SHADOWSOCKS
+                Proxy.Type.VLESS -> Outbound.Type.VLESS
                 ProxyGroup.Type.SELECT -> Outbound.Type.SELECTOR
                 ProxyGroup.Type.URL_TEST -> Outbound.Type.URLTEST
                 else -> throw IllegalArgumentException("unsupported clash proxy type: $type")
@@ -49,20 +50,27 @@ class SubParserClash(srcContent: String, headers: Headers) : SubParser(srcConten
     }
 
     override suspend fun getSingBox(): SingBox? {
-        this._singBox = getDefaultSingBox()
+        this._singBox = originSingBox ?: getDefaultSingBox()
         val map = Yaml().load<Map<String, Any?>>(srcContent)
-        val clash =customJson.decodeFromMap<Clash>(map)
-        clash.proxies.forEach {
-            this.singBox?.outbounds?.add(convert2Outbound(it))
+        val clash = customJson.decodeFromMap<Clash>(map)
+        if (singBox?.outbounds.isNullOrEmpty()) {
+            this.singBox?.outbounds?.add(Outbound.direct())
+            clash.proxies.forEach {
+                val outbound = convert2Outbound(it)
+                this.singBox?.outbounds?.add(outbound)
+            }
+        } else {
+            singBox?.route?.final = null
+            singBox?.outbounds?.removeIf { !it.outbounds.isNullOrEmpty() }
         }
-        clash.proxyGroups.reversed().forEach {
-            val outbound = convert2Outbound(it)
+        clash.proxyGroups.reversed().forEach { proxyGroup ->
+            val outbound = convert2Outbound(proxyGroup)
             if (outbound != null) {
                 this.singBox?.outbounds?.add(0, outbound)
             }
         }
         // sing-box 不支持 [Outbound.type] = [ProxyGroup.Type.FALLBACK] 的节点（代理组），需要移除。
-        if (singBox?.outbounds?.isNotEmpty() ?: false) {
+        if (this.singBox?.outbounds?.isNotEmpty() ?: false) {
             willRemovedGroup.forEach { proxyGroup ->
                 this.singBox?.outbounds?.forEach { outbound ->
                     if (outbound.outbounds?.isNotEmpty() ?: false) {
@@ -140,13 +148,33 @@ class SubParserClash(srcContent: String, headers: Headers) : SubParser(srcConten
                     utls = if (proxy.clientFingerprint.isNullOrBlank()) null else Outbound.Tls.Utls(enabled = true, fingerprint = proxy.clientFingerprint)
                 )
             )
+            Outbound.Type.VLESS -> Outbound.vless(
+                tag = proxy.name,
+                server = proxy.server,
+                serverPort = proxy.port,
+                uuid = proxy.uuid!!,
+                flow = proxy.flow,
+                network = if (proxy.udp ?: false) Outbound.Network.UDP else Outbound.Network.TCP,
+                tls = Outbound.Tls(
+                    enabled = true,
+                    disableSni = proxy.serverName.isNullOrBlank(),
+                    insecure = true,
+                    serverName = proxy.serverName ?: "",
+                    utls = if (proxy.clientFingerprint.isNullOrBlank()) null else Outbound.Tls.Utls(enabled = true, fingerprint = proxy.clientFingerprint),
+                    reality = if (proxy.realityOpts?.publicKey.isNullOrBlank()) null else Outbound.Tls.Reality(
+                        enabled = true,
+                        shortId = proxy.realityOpts.shortId ?: throw Exception("reality shortId is null"),
+                        publicKey = proxy.realityOpts.publicKey
+                    )
+                )
+            )
             Outbound.Type.SHADOWSOCKS -> Outbound.shadowsocks(
                 tag = proxy.name,
                 server = proxy.server,
                 serverPort = proxy.port,
                 password = proxy.password!!,
                 method = proxy.cipher ?: "",
-                network = if (proxy.udp ?: false) "udp" else "tcp"
+                network = if (proxy.udp ?: false) Outbound.Network.UDP else Outbound.Network.TCP
             )
             else -> throw IllegalArgumentException("unsupported clash proxy type: ${proxy.type}")
         }
@@ -167,7 +195,7 @@ class SubParserClash(srcContent: String, headers: Headers) : SubParser(srcConten
                 tag = group.name,
                 outbounds = group.proxies.toMutableList(),
                 url = group.url ?: "https://www.gstatic.com/generate_204",
-                interval = if (group.interval == null) "3m" else "${group.interval / 60}m",
+                interval = if (group.interval == null) "3m" else "${ (if (group.interval > 600) 300 else group.interval) / 60}m",
                 tolerance = 50
             )
             else -> throw IllegalArgumentException("unsupported clash proxy type: ${group.type}")
@@ -202,7 +230,7 @@ class SubParserClash(srcContent: String, headers: Headers) : SubParser(srcConten
             totalBytes = totalBytes,
             expireTimestamp = expireTimestamp,
             spUrl = profileWebPageUrl,
-            spDisposition = contentDisposition
+            spDisposition = if (contentDisposition.isNullOrBlank()) null else Uri.decode(contentDisposition)
         )
     }
 

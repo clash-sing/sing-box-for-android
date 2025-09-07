@@ -8,7 +8,7 @@ data class Inbound(
 
     /** @see: [Type] */
     val type: String,
-    val tag: String,
+    val tag: String? =  null,
     val address: List<String>? = null,
     val mtu: Long? = null,
 
@@ -42,9 +42,21 @@ data class Inbound(
     @Deprecated("仅在【监听字段】中有说明，且已经在 v1.11.0 版本中废弃。")
     @SerialName("sniff_override_destination")
     val sniffOverrideDestination: Boolean? = null,
-    val platform: Platform? = null
+    val platform: Platform? = null,
 
-) {
+    @SerialName("domain_strategy")
+    val domainStrategy: String? = null,
+    @SerialName("endpoint_independent_nat")
+    val endpointIndependentNat: Boolean? = null,
+    @SerialName("inet4_address")
+    val inet4Address: String? = null,
+    @SerialName("inet6_address")
+    val inet6Address: String? = null,
+    val users: List<String>? = null,
+
+
+
+    ) {
     companion object {
         fun createTun(
             tag: String = "tun",
@@ -113,14 +125,14 @@ data class Inbound(
     @Serializable
     data class Platform(
         @SerialName("http_proxy")
-        val httpProxy: HttpProxy = HttpProxy(),
+        var httpProxy: HttpProxy = HttpProxy(),
     ) {
         @Serializable
         data class HttpProxy(
-            val enabled: Boolean = false,
-            val server: String = "127.0.0.1",
+            var enabled: Boolean = false,
+            var server: String = "127.0.0.1",
             @SerialName("server_port")
-            val serverPort: Long = 8890
+            var serverPort: Long = 8890
         )
     }
 

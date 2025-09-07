@@ -8,10 +8,10 @@ data class Dns(
     val servers: List<DnsServer>,
     val rules: List<DnsRule>,
     @SerialName("independent_cache")
-    val independentCache: Boolean = false,
+    var independentCache: Boolean = false,
     /** @see [DnsServer.Tag] */
-    val final: String = DnsServer.Tag.ALIDOH_FOR_HTTPS,
-    val strategy: String = Strategy.PREFER_IPV6
+    val final: String? = null,
+    val strategy: String? = null
 ) {
     object Strategy {
         const val PREFER_IPV4 = "prefer_ipv4"

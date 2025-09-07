@@ -14,7 +14,7 @@ import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
-class SubParserRocket(srcContent: String, headers: Headers) : SubParser(srcContent, headers) {
+class SubParserRocket(originSingBox: SingBox?, srcContent: String, headers: Headers) : SubParser(originSingBox, srcContent, headers) {
     private var decodeContent: String? = null
     private var statusLine: String? = null
     private val outbounds: MutableList<Outbound> = mutableListOf()
@@ -37,6 +37,7 @@ class SubParserRocket(srcContent: String, headers: Headers) : SubParser(srcConte
         if (outbounds.isNotEmpty()) {
             this._singBox = getDefaultSingBox()
             this.singBox?.let {
+                it.outbounds.add(Outbound.direct())
                 it.outbounds.addAll(outbounds)
 
                 val urlTestTag = ProxyComponent.application.getString(R.string.proxy_lib_url_test_default_tag)

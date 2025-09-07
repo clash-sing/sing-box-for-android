@@ -37,15 +37,32 @@ data class Proxy(
     @SerialName("disable_mtu_discovery")
     val disableMtuDiscovery: Boolean? = null,
 
-    /** shadowsocks 加密方法 */
-    @Deprecated("仅对 shadowsocks 协议有效")
-    val cipher: String? = null
+    /** vless uuid */
+    val uuid: String? = null,
+    val alterId: Long? = null,
+    val flow: String? = null,
+    val tls: Boolean? = null,
+    @SerialName("servername")
+    val serverName: String? = null,
+
+    /** shadowsocks/vless 加密方法 */
+    val cipher: String? = null,
+    @SerialName("reality-opts")
+    val realityOpts: RealityOpts? = null
 ) {
     object Type {
         const val HYSTERIA2 = "hysteria2"
         const val HYSTERIA = "hysteria"
         const val ANYTLS = "anytls"
         const val TROJAN = "trojan"
+        const val VLESS = "vless"
         const val SHADOWSOCKS = "ss"
     }
+    @Serializable
+    data class RealityOpts(
+        @SerialName("public-key")
+        val publicKey: String,
+        @SerialName("short-id")
+        val shortId: String? = null,
+    )
 }

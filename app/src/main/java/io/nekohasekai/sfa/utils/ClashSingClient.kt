@@ -7,17 +7,16 @@ import com.clashsing.proxylib.SubUserinfoManager
 import com.clashsing.proxylib.parser.SubParser
 import com.clashsing.proxylib.parser.SubParserClash
 import com.clashsing.proxylib.parser.SubParserRocket
+import com.clashsing.proxylib.schema.SingBox
 import com.clashsing.proxylib.schema.customJson
 import io.nekohasekai.sfa.Application
 import okhttp3.Headers
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okio.Buffer
-import okio.BufferedSource
 import okio.GzipSource
 import okio.buffer
 import java.io.Closeable
-import java.util.concurrent.TimeUnit
 
 class ClashSingClient(val profileId: Long) : Closeable {
     companion object {
@@ -33,7 +32,12 @@ class ClashSingClient(val profileId: Long) : Closeable {
 
     @WorkerThread
     suspend fun getString(url: String): String {
+        val singBoxContent = HTTPClient().use { it.getString(url) }
         val resultClashSing = runCatching {
+            var originSingBox: SingBox? = null
+            if (singBoxContent.startsWith("{")) {
+                originSingBox = customJson.decodeFromString<SingBox>(singBoxContent)
+            }
             var subParser: SubParser? = null
             val wrapper = getClashSingString(url)
             val srcContent = wrapper.content
@@ -43,13 +47,13 @@ class ClashSingClient(val profileId: Long) : Closeable {
                 return srcContent
             } else if (firstLine.contains(":")) { // Yaml
                 try {
-                    subParser = SubParserClash(srcContent, headers)
+                    subParser = SubParserClash(originSingBox, srcContent, headers)
                 } catch (e: Exception) {
                     Log.e("ClashSingClient", "Yaml decode failed.", e)
                 }
             } else { // Base64
                 try {
-                    subParser = SubParserRocket(srcContent, headers)
+                    subParser = SubParserRocket(originSingBox, srcContent, headers)
                 } catch (e: Exception) {
                     Log.e("ClashSingClient", "Base64 decode failed.", e)
                 }
@@ -66,11 +70,10 @@ class ClashSingClient(val profileId: Long) : Closeable {
             }
             clashSingContent
         }
-        if (resultClashSing.isSuccess) {
-            return resultClashSing.getOrNull() ?: throw Exception("Response body is null.")
+        return if (resultClashSing.isSuccess) {
+            resultClashSing.getOrNull() ?: throw Exception("Response body is null.")
         } else {
-            val content = HTTPClient().use { it.getString(url) }
-            return content
+            singBoxContent
         }
     }
 
@@ -88,7 +91,7 @@ class ClashSingClient(val profileId: Long) : Closeable {
         } else {
             source
         }
-        val csContent = gzipSource.buffer().use<BufferedSource, String> {
+        val csContent = gzipSource.buffer().use {
             val buffer = Buffer()
             it.readAll(buffer)
             buffer.readString(response.body.contentType()?.charset() ?: Charsets.UTF_8)
@@ -99,7 +102,7 @@ class ClashSingClient(val profileId: Long) : Closeable {
     private fun getUserAgent(): String {
         val defaultUserAgent = try {
             WebSettings.getDefaultUserAgent(Application.Companion.application)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             System.getProperty("http.agent") ?: ""
         }
         return "$defaultUserAgent $USER_AGENT"

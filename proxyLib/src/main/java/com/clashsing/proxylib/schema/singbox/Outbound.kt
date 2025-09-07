@@ -61,7 +61,26 @@ data class Outbound(
     val tls: Tls? = null,
     val transport: Transport? = null,
 
+    /**
+     * 启用的网络协议
+     * @see Network
+     */
     val network: String? = null,
+
+    val uuid: String? = null,
+    /**
+     * VLESS 子协议
+     * @see Flow
+     */
+    val flow: String? = null,
+
+    /**
+     * UDP 包编码，默认使用 xudp
+     * 为 null 时，表示禁用
+     * @see PacketEncoding
+     */
+    @SerialName("packet_encoding")
+    val packetEncoding: String? = null,
 
     /** shadowsocks 加密方法 */
     @Deprecated("仅用于 shadowsocks")
@@ -151,6 +170,17 @@ data class Outbound(
             password = password,
             network = network
         )
+        fun vless(tag: String, server: String, serverPort: Long, uuid: String, flow: String?,
+                  network: String?, tls: Tls) = Outbound(
+            type = Type.VLESS,
+            tag = tag,
+            server = server,
+            serverPort = serverPort,
+            uuid = uuid,
+            flow = flow,
+            network = network,
+            tls = tls
+        )
     }
     object Type {
         const val DIRECT = "direct"
@@ -174,22 +204,40 @@ data class Outbound(
         const val URLTEST = "urltest"
     }
 
+    object Network {
+        const val TCP = "tcp"
+        const val UDP = "udp"
+    }
+
+    object Flow {
+        const val XTLS_RPRX_VISION = "xtls-rprx-vision"
+    }
+
+    /**
+     * UDP 包编码，默认使用 xudp
+     */
+    object PacketEncoding {
+        const val PACKETADDR = "packetaddr"
+        const val XUDP = "xudp"
+    }
+
     @Serializable
     data class Tls(
-        val enabled: Boolean = true,
+        var enabled: Boolean = true,
         @SerialName("disable_sni")
-        val disableSni: Boolean = false,
+        var disableSni: Boolean = false,
         @SerialName("server_name")
-        val serverName: String = "",
-        val insecure: Boolean = false,
+        var serverName: String = "",
+        var insecure: Boolean = false,
         val alpn: List<String>? = null,
-        val utls: Utls? = null
+        val utls: Utls? = null,
+        val reality: Reality? = null
     ) {
 
         @Serializable
         data class Utls(
-            val enabled: Boolean = true,
-            val fingerprint: String = CHROME,
+            var enabled: Boolean = true,
+            var fingerprint: String = CHROME,
         ) {
             companion object {
                 const val CHROME = "chrome"
@@ -203,11 +251,19 @@ data class Outbound(
                 const val RANDOMIZED = "randomized"
             }
         }
+        @Serializable
+        data class Reality(
+            val enabled: Boolean,
+            @SerialName("public_key")
+            val publicKey: String,
+            @SerialName("short_id")
+            val shortId: String,
+        )
     }
 
     @Serializable
     data class Transport(
-        val type: String = WEB_SOCKET,
+        var type: String = WEB_SOCKET,
     ) {
         companion object {
             const val TYPE_HTTP = "http"
