@@ -50,6 +50,12 @@ class SubParserClash(originSingBox: SingBox?, srcContent: String, headers: Heade
     }
 
     override suspend fun getSingBox(): SingBox? {
+        TODO("未实现 VLESS 协议")
+        val vlessOutbound = originSingBox?.outbounds?.find { it.type == Outbound.Type.VLESS }
+        if (vlessOutbound != null) {
+            throw IllegalArgumentException("直接由 sing-box 处理。")
+        }
+
         this._singBox = originSingBox ?: getDefaultSingBox()
         val map = Yaml().load<Map<String, Any?>>(srcContent)
         val clash = customJson.decodeFromMap<Clash>(map)
