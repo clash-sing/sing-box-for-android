@@ -8,18 +8,14 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class RouteRule(
     /** @see [Action] */
-    var action: String = Action.ROUTE,
+    val action: String? = null,
 
     /** @see [ClashMode] */
     @SerialName("clash_mode")
-    val clashMode: String? = null,
+    var clashMode: String? = null,
 
-    /**
-     * 出站标签 [Outbound.tag]
-     * Deprecated, @see [action]
-     */
-    @Deprecated("已在 sing-box 1.11.0 废弃")
-    val outbound: String? = null,
+    /** 出站标签 [Outbound.tag] */
+    var outbound: String? = null,
 
     /** @see [RouteRuleSet.tag] */
     @SerialName("rule_set")
@@ -36,12 +32,11 @@ data class RouteRule(
 
     @Serializable(with = StringOrStringListSerializer::class)
     @SerialName("protocol")
-    val protocols: StringOrStringList? = null
+    var protocols: StringOrStringList? = null
 ) {
     companion object {
-        fun createRoute(outbound: String, clashMode: String?, ruleSet: List<String> = listOf(
-            RouteRuleSet.Tag.GEOIP_CN, RouteRuleSet.Tag.GEOSITE_CN), ipIsPrivate: Boolean? = null,
-        ): RouteRule = RouteRule(action = Action.ROUTE, outbound = outbound,
+        fun createRoute(action: String?, outbound: String?, clashMode: String?, ruleSet: List<String>?, ipIsPrivate: Boolean? = null,
+        ): RouteRule = RouteRule(action = action, outbound = outbound,
             clashMode = clashMode, ruleSet = ruleSet, ipIsPrivate = ipIsPrivate)
         fun createSniff(): RouteRule = RouteRule(action = Action.SNIFF)
         fun createReject(method: String = Method.DEFAULT, noDrop: Boolean? = null,
@@ -86,6 +81,7 @@ data class RouteRule(
     object ClashMode {
         const val DIRECT = "direct"
         const val GLOBAL = "global"
+        const val BLOCK = "block"
     }
     object Method {
         const val DEFAULT = "default"

@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Route(
-    val rules: List<RouteRule>,
+    val rules: MutableList<RouteRule>,
     @SerialName("rule_set")
     val ruleSet: List<RouteRuleSet>,
 
