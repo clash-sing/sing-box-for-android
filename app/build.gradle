@@ -34,28 +34,28 @@ android {
         setProperty("archivesBaseName", "ClashSing-" + versionName)
     }
 
-    signingConfigs {
-        release {
-            storeFile file("release.keystore")
-            storePassword getProps("KEYSTORE_PASS")
-            keyAlias getProps("ALIAS_NAME")
-            keyPassword getProps("ALIAS_PASS")
-        }
-    }
-
-    buildTypes {
-        debug {
-            if (getProps("KEYSTORE_PASS") != "") {
-                signingConfig signingConfigs.release
-            }
-        }
-        release {
-            minifyEnabled true
-            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
-            signingConfig signingConfigs.release
-            vcsInfo.include false
-        }
-    }
+//    signingConfigs {
+//        release {
+//            storeFile file("release.keystore")
+//            storePassword getProps("KEYSTORE_PASS")
+//            keyAlias getProps("ALIAS_NAME")
+//            keyPassword getProps("ALIAS_PASS")
+//        }
+//    }
+//
+//    buildTypes {
+//        debug {
+//            if (getProps("KEYSTORE_PASS") != "") {
+//                signingConfig signingConfigs.release
+//            }
+//        }
+//        release {
+//            minifyEnabled true
+//            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
+//            signingConfig signingConfigs.release
+//            vcsInfo.include false
+//        }
+//    }
 
     dependenciesInfo {
         includeInApk = false
