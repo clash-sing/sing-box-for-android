@@ -23,7 +23,7 @@ data class DnsServer(
     val inet6Range: String? = null,
 
     val address: String? = null,
-    val detour: String? = null,
+    var detour: String? = null,
 ) {
     companion object {
         const val ALI_DNS = "223.5.5.5"

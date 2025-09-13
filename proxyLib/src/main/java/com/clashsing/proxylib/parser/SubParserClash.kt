@@ -73,6 +73,7 @@ class SubParserClash(originSingBox: SingBox?, srcContent: String, headers: Heade
             singBox?.outbounds?.removeIf { !it.outbounds.isNullOrEmpty() }
         }
 
+/*
         // 添加 block 出站，添加 clash_mode = "block"
         val blockRouteRule = this.singBox?.route?.rules?.firstOrNull {
             it.action == RouteRule.Action.REJECT
@@ -86,6 +87,7 @@ class SubParserClash(originSingBox: SingBox?, srcContent: String, headers: Heade
 
 //            this.singBox?.route?.rules?.add(RouteRule(action = RouteRule.Action.ROUTE, clashMode = RouteRule.ClashMode.BLOCK, outbound = blockOutbound.tag))
         }
+*/
 
         clash.proxyGroups.reversed().forEach { proxyGroup ->
             val outbound = convert2Outbound(proxyGroup)
@@ -106,6 +108,37 @@ class SubParserClash(originSingBox: SingBox?, srcContent: String, headers: Heade
             }
         }
 
+        val defaultOutboundTag = this.singBox?.outbounds?.elementAtOrNull(0)?.let {
+            if (it.outbounds?.isNotEmpty() == true) {
+                it.tag
+            } else null
+        }
+        if (defaultOutboundTag != null) {
+            for (rule in this.singBox?.route?.rules ?: emptyList()) {
+                if (rule.outbound != null) {
+                    val findOutbound = this.singBox?.outbounds?.find { outbound ->
+                        outbound.tag == rule.outbound
+                    }
+                    if (findOutbound == null) {
+                        rule.outbound = defaultOutboundTag
+                    }
+                }
+            }
+            for (server in this.singBox?.dns?.servers ?: emptyList()) {
+                if (server.detour != null) {
+                    val findOutbound = this.singBox?.outbounds?.find { outbound ->
+                        outbound.tag == server.detour
+                    }
+                    if (findOutbound == null) {
+                        server.detour = defaultOutboundTag
+                    }
+                }
+            }
+
+
+        }
+
+/*
         // 修正 GLOBAL 模式
         val globalRouteRule = this.singBox?.route?.rules?.firstOrNull {
             it.clashMode == RouteRule.ClashMode.GLOBAL
@@ -118,6 +151,7 @@ class SubParserClash(originSingBox: SingBox?, srcContent: String, headers: Heade
                 globalRouteRule.outbound = outbound.tag
             }
         }
+*/
 
         return this.singBox
     }
