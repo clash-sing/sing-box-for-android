@@ -32,7 +32,10 @@ data class RouteRule(
 
     @Serializable(with = StringOrStringListSerializer::class)
     @SerialName("protocol")
-    var protocols: StringOrStringList? = null
+    var protocols: StringOrStringList? = null,
+
+    @SerialName("ip_cidr")
+    val ipCidr: List<String>? = null
 ) {
     companion object {
         fun createRoute(action: String?, outbound: String?, clashMode: String?, ruleSet: List<String>?, ipIsPrivate: Boolean? = null,
