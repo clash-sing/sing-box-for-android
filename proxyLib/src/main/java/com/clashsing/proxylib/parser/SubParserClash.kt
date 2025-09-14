@@ -9,7 +9,6 @@ import com.clashsing.proxylib.schema.clash.ProxyGroup
 import com.clashsing.proxylib.schema.customJson
 import com.clashsing.proxylib.schema.decodeFromMap
 import com.clashsing.proxylib.schema.singbox.Outbound
-import com.clashsing.proxylib.schema.singbox.RouteRule
 import okhttp3.Headers
 import org.yaml.snakeyaml.Yaml
 import kotlin.text.split
@@ -51,14 +50,6 @@ class SubParserClash(originSingBox: SingBox?, srcContent: String, headers: Heade
     }
 
     override suspend fun getSingBox(): SingBox? {
-/*
-        TODO("未实现 VLESS 协议")
-        val vlessOutbound = originSingBox?.outbounds?.find { it.type == Outbound.Type.VLESS }
-        if (vlessOutbound != null) {
-            throw IllegalArgumentException("直接由 sing-box 处理。")
-        }
-*/
-
         this._singBox = originSingBox ?: getDefaultSingBox()
         val map = Yaml().load<Map<String, Any?>>(srcContent)
         val clash = customJson.decodeFromMap<Clash>(map)
@@ -72,22 +63,6 @@ class SubParserClash(originSingBox: SingBox?, srcContent: String, headers: Heade
             singBox?.route?.final = null
             singBox?.outbounds?.removeIf { !it.outbounds.isNullOrEmpty() }
         }
-
-/*
-        // 添加 block 出站，添加 clash_mode = "block"
-        val blockRouteRule = this.singBox?.route?.rules?.firstOrNull {
-            it.action == RouteRule.Action.REJECT
-        }
-        if (blockRouteRule != null) {
-            val blockOutbound = Outbound.block()
-            this.singBox?.outbounds?.add(0, blockOutbound)
-            blockRouteRule.clashMode = RouteRule.ClashMode.BLOCK
-            blockRouteRule.outbound = blockOutbound.tag
-            blockRouteRule.protocols = null
-
-//            this.singBox?.route?.rules?.add(RouteRule(action = RouteRule.Action.ROUTE, clashMode = RouteRule.ClashMode.BLOCK, outbound = blockOutbound.tag))
-        }
-*/
 
         clash.proxyGroups.reversed().forEach { proxyGroup ->
             val outbound = convert2Outbound(proxyGroup)
@@ -137,21 +112,6 @@ class SubParserClash(originSingBox: SingBox?, srcContent: String, headers: Heade
 
 
         }
-
-/*
-        // 修正 GLOBAL 模式
-        val globalRouteRule = this.singBox?.route?.rules?.firstOrNull {
-            it.clashMode == RouteRule.ClashMode.GLOBAL
-        }
-        if (globalRouteRule != null) {
-            val outbound = this.singBox?.outbounds?.firstOrNull {
-                !it.outbounds.isNullOrEmpty() && it.type == Outbound.Type.SELECTOR
-            }
-            if (outbound != null) {
-                globalRouteRule.outbound = outbound.tag
-            }
-        }
-*/
 
         return this.singBox
     }
