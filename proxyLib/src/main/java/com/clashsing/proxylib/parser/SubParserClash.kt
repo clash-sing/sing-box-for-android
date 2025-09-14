@@ -67,7 +67,15 @@ class SubParserClash(originSingBox: SingBox?, srcContent: String, headers: Heade
         clash.proxyGroups.reversed().forEach { proxyGroup ->
             val outbound = convert2Outbound(proxyGroup)
             if (outbound != null) {
-                this.singBox?.outbounds?.add(0, outbound)
+                for (i in (outbound.outbounds?.size ?: 0) - 1 downTo 0) {
+                    val foundTag = this.singBox?.outbounds?.find { it.tag == outbound.outbounds!![i] }
+                    if (foundTag == null) {
+                        outbound.outbounds?.removeAt(i)
+                    }
+                }
+                if (outbound.outbounds?.isNotEmpty() == true) {
+                    this.singBox?.outbounds?.add(0, outbound)
+                }
             }
         }
         // sing-box 不支持 [Outbound.type] = [ProxyGroup.Type.FALLBACK] 的节点（代理组），需要移除。
