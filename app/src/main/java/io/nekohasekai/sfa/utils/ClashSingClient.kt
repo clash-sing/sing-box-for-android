@@ -5,8 +5,9 @@ import android.webkit.WebSettings
 import androidx.annotation.WorkerThread
 import com.clashsing.proxylib.SubUserinfoManager
 import com.clashsing.proxylib.parser.SubParser
-import com.clashsing.proxylib.parser.SubParserClash
-import com.clashsing.proxylib.parser.SubParserRocket
+import com.clashsing.proxylib.parser.SubParserYaml
+import com.clashsing.proxylib.parser.SubParserBase64
+import com.clashsing.proxylib.parser.SubParserJson
 import com.clashsing.proxylib.schema.SingBox
 import com.clashsing.proxylib.schema.customJson
 import io.nekohasekai.sfa.Application
@@ -44,16 +45,16 @@ class ClashSingClient(val profileId: Long) : Closeable {
             val firstLine = srcContent.lineSequence().first()
             val headers = wrapper.headers
             if (firstLine.startsWith("{")) { // Json
-                return srcContent
+                subParser = SubParserJson(originSingBox, srcContent, headers)
             } else if (firstLine.contains(":")) { // Yaml
                 try {
-                    subParser = SubParserClash(originSingBox, srcContent, headers)
+                    subParser = SubParserYaml(originSingBox, srcContent, headers)
                 } catch (e: Exception) {
                     Log.e("ClashSingClient", "Yaml decode failed.", e)
                 }
             } else { // Base64
                 try {
-                    subParser = SubParserRocket(originSingBox, srcContent, headers)
+                    subParser = SubParserBase64(originSingBox, srcContent, headers)
                 } catch (e: Exception) {
                     Log.e("ClashSingClient", "Base64 decode failed.", e)
                 }

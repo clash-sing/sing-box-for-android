@@ -13,7 +13,7 @@ import okhttp3.Headers
 import org.yaml.snakeyaml.Yaml
 import kotlin.text.split
 
-class SubParserClash(originSingBox: SingBox?, srcContent: String, headers: Headers) : SubParser(originSingBox, srcContent, headers) {
+class SubParserYaml(originSingBox: SingBox?, srcContent: String, headers: Headers) : SubParser(originSingBox, srcContent, headers) {
 
     private val willRemovedGroup = mutableListOf<ProxyGroup>()
     companion object {

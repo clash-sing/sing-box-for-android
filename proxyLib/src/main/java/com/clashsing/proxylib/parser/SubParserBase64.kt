@@ -14,7 +14,7 @@ import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
-class SubParserRocket(originSingBox: SingBox?, srcContent: String, headers: Headers) : SubParser(originSingBox, srcContent, headers) {
+class SubParserBase64(originSingBox: SingBox?, srcContent: String, headers: Headers) : SubParser(originSingBox, srcContent, headers) {
     private var decodeContent: String? = null
     private var statusLine: String? = null
     private val outbounds: MutableList<Outbound> = mutableListOf()
